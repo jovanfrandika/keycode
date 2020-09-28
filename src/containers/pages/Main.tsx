@@ -2,12 +2,16 @@ import React from "react";
 
 import Layout from "../Layout";
 
+import { Box, Text } from "@chakra-ui/core";
+
 const Main = () => {
   return (
     <Layout>
-      <div>
-        <p>Title</p>
-      </div>
+      <Box>
+        <Text fontSize="6xl" color="white">
+          Fill me up
+        </Text>
+      </Box>
     </Layout>
   );
 };
