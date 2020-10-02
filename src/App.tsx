@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import React from "react";
+import { Switch, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import { ThemeProvider, CSSReset } from "@chakra-ui/core";
 
@@ -8,7 +8,8 @@ import "./App.css";
 import store from "./store";
 import customTheme from "./theme";
 
-import Main from "./containers/pages/Main";
+
+import Main from "./pages/Main";
 
 import "./App.css";
 
