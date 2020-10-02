@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "@chakra-ui/core";
 
-import Character from "./Character";
 import { CharacterState } from "../constants/enums";
 
-const TEST_VALUE = `list
-_for_each_entry(sdata, &local->interfaces, list) {
+import Character from "./Character";
+
+const TEST_VALUE = `list_for_each_entry(sdata, &local->interfaces, list) {
   if (!ieee80211_sdata_running(sdata))
     continue;
   switch (sdata->vif.type) {
@@ -39,6 +39,9 @@ _for_each_entry(sdata, &local->interfaces, list) {
 }
 `;
 
+const START = 0;
+const END = TEST_VALUE.length;
+
 const BLOCKED_KEYS = ["Shift"]
 
 const Editor: React.FC = () => {
@@ -49,7 +52,12 @@ const Editor: React.FC = () => {
     key: string;
   } | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentCharacterState, setCurrentCharacterState] = useState<CharacterState>(CharacterState.NORMAL);
   // const [characterStates, setCharacterStates] = useState<CharacterState[]>([]);
+
+  const [start, setStart] = useState<number>(0);
+  const [wpm, setWpm] = useState<number>(0);
+  const [cpm, setCpm] = useState<number>(0);
 
   useEffect(() => {
     setValue(TEST_VALUE.split(""));
@@ -74,9 +82,19 @@ const Editor: React.FC = () => {
         if (value[currentIndex]?.charCodeAt(0) === currentTyped?.charCode) {
           setCurrentIndex(currentIndex + 1);
           setCurrentTyped(null);
+          setCurrentCharacterState(CharacterState.NORMAL);
+          console.log(start);
+          if (currentIndex === END) {
+            let stop = Date.now();
+            let duration = stop - start;
+
+            setWpm(END / (duration));
+            setCpm(END / (duration));
+          }
         }
         /** If not correct */
         else {
+          setCurrentCharacterState(CharacterState.WRONG);
         };
       }
     }
@@ -87,7 +105,14 @@ const Editor: React.FC = () => {
   const editorListener = () => {
     window.addEventListener("keypress", (event: KeyboardEvent) => {
       BLOCKED_KEYS.forEach((key) => {
-        console.log(key);
+
+        if (currentIndex === START) {
+          console.log("---- black magic ----");
+          console.log(currentIndex);
+          console.log(START);
+          setStart(Date.now());
+        }
+
         if (event.charCode === 32 || event.key === "Enter" || event.key === "Tab") {
           event.preventDefault();
         };
@@ -112,12 +137,15 @@ const Editor: React.FC = () => {
             <Character
               key={`value-${val}-${index}`}
               character={val || ""}
-              typed={index === currentIndex ? currentTyped : null}
+              typed={currentIndex === index ? currentTyped : null}
               currentIndex={currentIndex}
               characterIndex={index}
               setCurrentIndex={setCurrentIndex}
               showCursor={currentIndex === index}
-              characterState={CharacterState.NORMAL}
+              characterState={
+                currentIndex === index ? currentCharacterState :
+                  // All characters behind cursor must be correct                      
+                  currentIndex >= index ? CharacterState.CORRECT : CharacterState.NORMAL}
             />
           )))}
         </>

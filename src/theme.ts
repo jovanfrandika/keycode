@@ -13,7 +13,7 @@ const customTheme = {
     },
     correct: "#68d391",
     wrong: "#f56565",
-    normal: "##171923",
+    normal: "#F7FAFC",
   },
   fonts: {
     heading: '"Avenir Next", sans-serif',
@@ -40,7 +40,7 @@ const customTheme = {
       700: "#2a69ac",
     },
     correct: "#68d391",
-    wrong: "#f56565",
+    wrong: "#553c9a",
     normal: "##171923",
   },
 };

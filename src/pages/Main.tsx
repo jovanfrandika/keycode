@@ -9,7 +9,7 @@ const Main: React.FC = () => {
   return (
     <Layout>
       <Box>
-        <Box background="#718096" width="50rem" p="4rem" mt="100rem">
+        <Box background="#718096" width="50rem" p="4rem" mt="70rem">
           <Editor />
         </Box>
       </Box>

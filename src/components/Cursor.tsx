@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box } from "@chakra-ui/core";
+import { CharacterState } from "../constants/enums";
 
 
 interface Props {
   showCursor: boolean;
   character: string;
+  characterState: CharacterState;
 };
 
 const BLINK_SPEED = 500;
@@ -27,7 +29,7 @@ const Cursor: React.FC<Props> = (props) => {
     <>
       <Box
         display="inline-block"
-        background={display && props.showCursor ? "white" : "none"}
+        background={display && props.showCursor ? props.characterState.toLowerCase() : "none"}
         h="18px"
         w="12px"
         textAlign="center"
