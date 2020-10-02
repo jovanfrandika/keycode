@@ -2,16 +2,16 @@ import React from "react";
 
 import Layout from "../containers/Layout";
 
-import { Flex, Box } from "@chakra-ui/core";
+import { Box } from "@chakra-ui/core";
 import Editor from "../components/Editor"
 
 const Main: React.FC = () => {
   return (
     <Layout>
       <Box>
-        <Flex background="#718096" width="30rem" p="4rem">
+        <Box background="#718096" width="50rem" p="4rem" mt="100rem">
           <Editor />
-        </Flex>
+        </Box>
       </Box>
     </Layout >
   );

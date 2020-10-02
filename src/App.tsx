@@ -3,8 +3,6 @@ import { Switch, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import { ThemeProvider, CSSReset } from "@chakra-ui/core";
 
-import "./App.css";
-
 import store from "./store";
 import customTheme from "./theme";
 

@@ -4,9 +4,10 @@ import { Box } from "@chakra-ui/core";
 
 interface Props {
   showCursor: boolean;
+  character: string;
 };
 
-const SPEED = 500;
+const BLINK_SPEED = 500;
 
 const Cursor: React.FC<Props> = (props) => {
 
@@ -18,17 +19,24 @@ const Cursor: React.FC<Props> = (props) => {
       clearTimeout(displayRef.current);
       displayRef.current = setTimeout(() => {
         setDisplay(!display);
-      }, SPEED)
+      }, BLINK_SPEED)
     }
   }, [props.showCursor, display]);
 
   return (
-    <Box
-      display="inline-block"
-      background={display && props.showCursor ? "white" : "none"}
-    >
-      {props.children}
-    </Box>
+    <>
+      <Box
+        display="inline-block"
+        background={display && props.showCursor ? "white" : "none"}
+        h="18px"
+        w="12px"
+        textAlign="center"
+      >
+        {props.character !== "\n" && props.children}
+      </Box>
+
+      {props.character === "\n" && <Box />}
+    </>
   )
 };
 

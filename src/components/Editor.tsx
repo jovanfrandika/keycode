@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Box } from "@chakra-ui/core";
 
 import Character from "./Character";
+import { CharacterState } from "../constants/enums";
 
-const TEST_VALUE = `list_for_each_entry(sdata, &local->interfaces, list) {
+const TEST_VALUE = `list
+_for_each_entry(sdata, &local->interfaces, list) {
   if (!ieee80211_sdata_running(sdata))
     continue;
   switch (sdata->vif.type) {
@@ -37,41 +39,64 @@ const TEST_VALUE = `list_for_each_entry(sdata, &local->interfaces, list) {
 }
 `;
 
-const BLOCKED_KEYS = ["Shift", "Tab"]
+const BLOCKED_KEYS = ["Shift"]
 
 const Editor: React.FC = () => {
-  const [value, setValue] = useState<string>("");
-  const [currentTyped, setCurrentTyped] = useState<string | null>(null);
+  const [value, setValue] = useState<string[]>([]);
+  const [currentTyped, setCurrentTyped] = useState<{
+    charCode: number;
+    keyCode: number;
+    key: string;
+  } | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  // const [characterStates, setCharacterStates] = useState<CharacterState[]>([]);
 
   useEffect(() => {
-    setValue(TEST_VALUE);
+    setValue(TEST_VALUE.split(""));
     editorListener();
   }, []);
 
+  // useEffect(() => {
+  //   setCharacterStates(Array(value.length).fill(CharacterState.CORRECT));
+  // }, [value])
+
   useEffect(() => {
-    // If character matches.
-    if (value[currentIndex] === currentTyped) {
-      console.log("bener");
-      setCurrentIndex((previousIndex) => previousIndex + 1);
-      setCurrentTyped(null);
+    if (currentTyped?.keyCode === 13) {
+      if (value[currentIndex] === "\n") {
+        setCurrentIndex(currentIndex + 1);
+        setCurrentTyped(null);
+      }
     }
-    // If character was just initialized.
-    else if (currentTyped === null) {
-      console.log('baru masuk');
-    }
-    // If character was wrong.
     else {
-      console.log("salah");
-    };
+      if (currentTyped !== null && currentTyped !== undefined) {
+
+        /** If correct */
+        if (value[currentIndex]?.charCodeAt(0) === currentTyped?.charCode) {
+          setCurrentIndex(currentIndex + 1);
+          setCurrentTyped(null);
+        }
+        /** If not correct */
+        else {
+        };
+      }
+    }
+
+
   }, [currentIndex, currentTyped, value]);
 
   const editorListener = () => {
-    window.addEventListener("keydown", (event: KeyboardEvent) => {
+    window.addEventListener("keypress", (event: KeyboardEvent) => {
       BLOCKED_KEYS.forEach((key) => {
-        if (event.key !== key) {
-          setCurrentTyped(event.key)
-        }
+        console.log(key);
+        if (event.charCode === 32 || event.key === "Enter" || event.key === "Tab") {
+          event.preventDefault();
+        };
+
+        setCurrentTyped({
+          charCode: event.charCode,
+          keyCode: event.keyCode,
+          key: event.key
+        })
       })
     });
   };
@@ -81,18 +106,23 @@ const Editor: React.FC = () => {
       <Box style={{
         whiteSpace: "pre-line"
       }}>
-        {value.split("").map(((val, index) => (
-          <Character
-            key={`value-${val}-${index}`}
-            character={val}
-            typed={index === currentIndex ? currentTyped : null}
-            currentIndex={currentIndex}
-            characterIndex={index}
-            setCurrentIndex={setCurrentIndex}
-            setCurrentTyped={setCurrentTyped}
-            showCursor={currentIndex === index}
-          />
-        )))}
+        {/* {characterStates && */}
+        <>
+          {value.map(((val, index) => (
+            <Character
+              key={`value-${val}-${index}`}
+              character={val || ""}
+              typed={index === currentIndex ? currentTyped : null}
+              currentIndex={currentIndex}
+              characterIndex={index}
+              setCurrentIndex={setCurrentIndex}
+              showCursor={currentIndex === index}
+              characterState={CharacterState.NORMAL}
+            />
+          )))}
+        </>
+        {/* } */}
+
       </Box>
     </Box>
   );
