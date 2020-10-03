@@ -3,6 +3,19 @@ import { reduxStatus } from "../constants/reduxTypes";
 import { HTTP_METHODS } from "../constants/enums";
 import axios from "../axios";
 
+const testValue = `aaaaaaaa
+bbbbbbbbbbbbbb
+cccccccccccccc
+dddddddddddddd
+e
+f
+g
+h
+i
+j
+k
+`;
+
 export const getFileContent = createAsyncThunk(
   "user/getFileContent",
   async ({ url }: { url: string }) => {
@@ -52,14 +65,7 @@ export const updateError = createAsyncThunk(
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    fileContent: `
-    abcdef
-    jojo
-    yes
-    yes
-    yes
-    yes
-    `,
+    fileContent: testValue,
     fileEnd: 0,
     files: [],
     currentError: 0,

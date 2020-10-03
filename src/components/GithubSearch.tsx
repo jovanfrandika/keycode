@@ -4,7 +4,7 @@ import axios from "../axios";
 import { useDispatch } from "react-redux";
 import { HTTP_METHODS } from "../constants/enums";
 import { FETCH_TIMEOUT } from "../constants/index";
-import { Box, Input, Text } from "@chakra-ui/core";
+import { Flex, Box, Input, Text } from "@chakra-ui/core";
 
 import { Repository } from "../constants/types";
 import { getFilesFromRepository } from "../features/userSlice";
@@ -47,13 +47,12 @@ const GithubSearch: React.FC = (props) => {
     });
     setRepositories(fetchedRepos);
   }
-
   return (
-    <Box mx="auto" color="normal">
+    <Box mx="auto" color="normal" w={["10rem", "30rem"]}>
       <Text fontSize="4xl" textAlign="center" >
         Github search
-          </Text>
-      <Box w="50%" mx="auto">
+      </Text>
+      <Box mx="auto">
         <Input
           placeholder="Search repository"
           color="#000"
@@ -63,18 +62,29 @@ const GithubSearch: React.FC = (props) => {
           }}
         />
       </Box>
-      <Box mx="auto" textAlign="center">
+      <Flex
+        position="absolute"
+        zIndex={1}
+        flexDirection="column"
+        bg="white"
+        pb={repositories.length ? "1rem" : ""}
+        borderRadius="0 0 0.5rem 0.5rem"
+        w="100%"
+      >
         {repositories.map((repo, index) => (
-          <Box key={`${repo.name}-${index}`} onClick={() => {
+          <Flex key={`${repo.name}-${index}`} cursor="pointer" onClick={() => {
             dispatch(getFilesFromRepository({
               owner: repo.owner,
               repo: repo.name,
             }));
           }}>
-            {repo.name}
-          </Box>
+            <Text ml="1rem" color="black">
+              {repo.name}
+
+            </Text>
+          </Flex>
         ))}
-      </Box>
+      </Flex>
       <Directory />
     </Box >
   );

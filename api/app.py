@@ -30,7 +30,7 @@ def download_file():
 @ app.route("/search/repo")
 def search_repositories():
     query = request.args.get("q")
-    search = requests.get(f"{baseURL}/search/repositories?q={query}",
+    search = requests.get(f"{baseURL}/search/repositories?q={query}&sort=stars&order=desc",
                           auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
     return search.json()
 
