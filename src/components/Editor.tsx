@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Box, Text } from "@chakra-ui/core";
+import { Flex, Box, Text } from "@chakra-ui/core";
 import { useSelector } from "react-redux";
 
 import { CharacterState } from "../constants/enums";
@@ -161,27 +161,30 @@ const Editor: React.FC = () => {
   return (
     <Box>
       {value.map(((array, rowIndex) => {
-        return array.map((val, colIndex) => (
-          <React.Fragment
-            key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
-          >
-            {colIndex === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl"> {rowIndex} </Text>}
-            <Character
-              // key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
-              character={val || ""}
-              typed={col === row ? currentTyped : null}
-              colIndex={colIndex}
-              rowIndex={rowIndex}
-              setCurrentIndex={setCol}
-              showCursor={col === colIndex && rowIndex === row}
-              characterState={
-                row === rowIndex && col === colIndex ? currentCharacterState : // cursor
-                  row > rowIndex ? CharacterState.CORRECT : // up  of  cursor
-                    row >= rowIndex && col >= colIndex ? CharacterState.CORRECT : CharacterState.NORMAL} // correct at left of cursor, normal on right of cursor
-            />
-          </React.Fragment>
-        )
-        )
+        return (
+          <Flex flexDirection="row" alignItems="center">
+            {array.map((val, colIndex) => (
+              <React.Fragment
+                key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
+              >
+                {colIndex === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl"> {rowIndex} </Text>}
+                <Character
+                  character={val || ""}
+                  typed={col === row ? currentTyped : null}
+                  colIndex={colIndex}
+                  rowIndex={rowIndex}
+                  setCurrentIndex={setCol}
+                  showCursor={col === colIndex && rowIndex === row}
+                  characterState={
+                    row === rowIndex && col === colIndex ? currentCharacterState : // cursor
+                      row > rowIndex ? CharacterState.CORRECT : // up  of  cursor
+                        row >= rowIndex && col >= colIndex ? CharacterState.CORRECT : CharacterState.NORMAL} // correct at left of cursor, normal on right of cursor
+                />
+              </React.Fragment>
+            )
+            )}
+          </Flex>
+        );
       }))}
     </Box>
   );

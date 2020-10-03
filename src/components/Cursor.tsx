@@ -31,7 +31,7 @@ const Cursor: React.FC<Props> = (props) => {
   return (
     <>
       <Box
-        display="inline-block"
+        // display="block"
         background={display && props.showCursor ? props.characterState.toLowerCase() : "none"}
         h="26px"
         w="12.5px"
@@ -40,7 +40,7 @@ const Cursor: React.FC<Props> = (props) => {
       >
         {props.character !== "\n" && props.children}
       </Box>
-      {props.character === "\n" && <Box />}
+      {/* {props.character === "\n" && <Box />} */}
     </>
   )
 };
