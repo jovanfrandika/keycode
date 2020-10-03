@@ -1,20 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 
 import Layout from "../containers/Layout";
 
-import { Box, Divider, Text, Input } from "@chakra-ui/core";
+import { Box, Divider, Text } from "@chakra-ui/core";
 
 import Editor from "../components/Editor"
 import Dashboard from "../components/Dashboard"
 import GithubSearch from "../components/GithubSearch";
 
 const Main: React.FC = () => {
-  const [editorValue, setEditorValue] = useState<string | undefined>("");
-
   return (
     <Layout>
       <Box width="75rem" pt="12.5rem">
-        <GithubSearch setEditorValue={setEditorValue} />
+        <GithubSearch />
         <Text fontSize="4xl" textAlign="center" color="normal" marginBottom={24}>Keycode</Text>
         <Box
           width="75rem"
@@ -25,7 +23,7 @@ const Main: React.FC = () => {
         >
           <Dashboard />
           <Divider />
-          <Editor editorValue={editorValue} />
+          <Editor />
         </Box>
       </Box>
     </Layout >

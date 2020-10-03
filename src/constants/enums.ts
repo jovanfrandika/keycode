@@ -3,3 +3,11 @@ export enum CharacterState {
   WRONG = "WRONG",
   NORMAL = "NORMAL",
 }
+
+export enum HTTP_METHODS {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE"
+}
+

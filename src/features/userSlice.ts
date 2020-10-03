@@ -1,5 +1,37 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { reduxStatus } from "../constants/reduxTypes";
+import { HTTP_METHODS } from "../constants/enums";
+import axios from "../axios";
+
+export const getFileContent = createAsyncThunk(
+  "user/getFileContent",
+  async ({ url }: { url: string }) => {
+    const response = await axios({
+      method: HTTP_METHODS.GET,
+      url: `/file?url=${url}`
+    })
+    // console.log(response);
+    const fileContent = String(response.data);
+    return fileContent;
+  });
+
+export const getFilesFromRepository = createAsyncThunk(
+  "user/getFilesFromRepository",
+  async ({ owner, repo }: { owner: string; repo: string; }) => {
+    const response = await axios({
+      method: HTTP_METHODS.GET,
+      url: `/search/files?owner=${owner}&repo=${repo}`,
+    });
+    const fetchedFiles = response.data.tree.map((file: any) => {
+      return {
+        path: file.path,
+        url: file.url,
+        type: file.type
+      }
+    });
+    return fetchedFiles;
+  });
+
 
 export const addSession = createAsyncThunk(
   "user/addSession",
@@ -17,34 +49,19 @@ export const updateError = createAsyncThunk(
   }
 );
 
-// export const login = createAsyncThunk(
-//   "user/login",
-//   async ({ email, password }: any) => {
-//     const data = await fromApi.login(email, password);
-//     await localStorage.setItem(JWTKeyname, data.jwt);
-//     return data;
-//   }
-// );
-
-// export const logout = createAsyncThunk("user/logout", async () => {
-//   const data = await fromApi.logout();
-//   await localStorage.removeItem(JWTKeyname);
-//   return data;
-// });
-
-// export const register = createAsyncThunk(
-//   "user/register",
-//   async ({ email, username, password }: any) => {
-//     const data = await fromApi.register(email, username, password);
-//     return data;
-//   }
-// );
-
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    id: "",
-    email: "",
+    fileContent: `
+    abcdef
+    jojo
+    yes
+    yes
+    yes
+    yes
+    `,
+    fileEnd: 0,
+    files: [],
     currentError: 0,
     currentSession: 0,
     sessions: [],
@@ -60,11 +77,32 @@ export const userSlice = createSlice({
       state.sessions = state.sessions.concat(action.payload);
       state.status = `addSession/${reduxStatus.success}`;
     },
-    [updateError.fulfilled as any]: (state, action: any) => {
-    },
     [addSession.rejected as any]: (state, action: any) => {
       state.status = `addSession/${reduxStatus.error}`;
     },
+
+    [getFileContent.pending as any]: (state, action: any) => {
+      state.status = `getFileContent/${reduxStatus.loading}`;
+    },
+    [getFileContent.fulfilled as any]: (state, action: any) => {
+      state.fileContent = action.payload;
+      state.fileEnd = action.payload.length - 1;
+      state.status = `getFileContent/${reduxStatus.success}`;
+    },
+    [getFileContent.rejected as any]: (state, action: any) => {
+      state.status = `addSession/${reduxStatus.error}`;
+    },
+
+    [getFilesFromRepository.pending as any]: (state, action: any) => { },
+    [getFilesFromRepository.fulfilled as any]: (state, action: any) => {
+      state.files = state.sessions.concat(action.payload);
+      state.status = `getFilesFromRepository/${reduxStatus.success}`;
+    },
+    [getFilesFromRepository.rejected as any]: (state, action: any) => { },
+
+    [updateError.pending as any]: (state, action: any) => { },
+    [updateError.fulfilled as any]: (state, action: any) => { },
+    [updateError.rejected as any]: (state, action: any) => { },
   },
 });
 
@@ -80,4 +118,18 @@ export const selectUserStatus = (state: any) => {
     status: String(state.user.status),
   };
 };
+
+export const selectFileContent = (state: any) => {
+  return {
+    fileContent: state.user.fileContent,
+    fileEnd: state.user.fileEnd
+  };
+};
+
+export const selectFiles = (state: any) => {
+  return {
+    files: state.user.files
+  };
+};
+
 export default userSlice.reducer;

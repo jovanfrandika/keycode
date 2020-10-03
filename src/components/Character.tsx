@@ -14,11 +14,10 @@ interface Props {
     charCode: number;
     key: string;
   } | null;
-  currentIndex: number;
-  characterIndex: number;
+  colIndex: number;
+  rowIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   characterState: CharacterState;
-  // setCurrentTyped: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 const Character: React.FC<Props> = React.memo((props) => {

@@ -23,10 +23,8 @@ def download_file():
     url = request.args.get("url")
     github_file = requests.get(url)
     content = github_file.json()["content"]
-    decode = str(base64.b64decode(content))
-    return {
-        "content": decode
-    }
+    decode = base64.b64decode(content)
+    return decode
 
 
 @ app.route("/search/repo")

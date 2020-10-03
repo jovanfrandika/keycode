@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { CharacterState } from "../constants/enums";
 
 import Character from "./Character";
-import { addSession, selectUser } from "../features/userSlice";
+import { addSession, selectUser, selectFileContent } from "../features/userSlice";
 
 const TEST_VALUES = [
   `list_for_each_entry
@@ -16,83 +16,83 @@ const TEST_VALUES = [
   hai`
 ];
 
-const START = 0;
-
-const END_VALUES = TEST_VALUES.map((END) => {
-  return END.length - 1;
-})
+// const START = 0;
+// const END_VALUES = TEST_VALUES.map((END) => {
+//   return END.length - 1;
+// })
 
 const BLOCKED_KEYS = ["Shift"];
 
-interface Props {
-  editorValue: string | undefined;
-};
-
-const Editor: React.FC<Props> = (props) => {
+const Editor: React.FC = () => {
   const dispatch = useDispatch();
+  const { currentSession } = useSelector(selectUser);
+  const { fileContent, fileEnd } = useSelector(selectFileContent);
 
-  const [value, setValue] = useState<string[]>([]);
+
+  const [value, setValue] = useState<string[][]>([]);
   const [currentTyped, setCurrentTyped] = useState<{
     charCode: number;
     keyCode: number;
     key: string;
   } | null>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentCharacterState, setCurrentCharacterState] = useState<CharacterState>(CharacterState.NORMAL);
 
   const [start, setStart] = useState<number>(0);
   const [errors, setErrors] = useState<number>(0);
-  const [line, setLine] = useState<number>(0);
 
-  const user = useSelector(selectUser);
+  const [col, setCol] = useState<number>(0);
+  const [row, setRow] = useState<number>(0);
+
+
 
   useEffect(() => {
     editorListener();
   }, [])
 
   useEffect(() => {
-    // setValue(TEST_VALUES[user?.currentSession].split(""));
-    if (props.editorValue) {
-      const content = props.editorValue.split("");
-      // setValue(props.editorValue.split(""));
-      setValue(content);
+    if (fileContent) {
+      const content = fileContent.split("");
+      // setValue(content);
+      setValue(transformValue(content));
     }
-  }, [props.editorValue])
+  }, [fileContent])
+
+  // useEffect(() => {
+  //   if (currentSession < fileContent) {
+  //     // setValue(TEST_VALUES[currentSession]);
+
+  //     setCurrentIndex(0);
+  //     setCurrentTyped(null);
+  //     setStart(0);
+  //     setErrors(0);
+  //     setCurrentCharacterState(CharacterState.NORMAL);
+  //   }
+
+  // }, [currentSession]);
 
   useEffect(() => {
-    if (user?.currentSession < TEST_VALUES.length) {
-      setValue(TEST_VALUES[user?.currentSession].split(""));
-
-      setCurrentIndex(0);
-      setCurrentTyped(null);
-      setStart(0);
-      setErrors(0);
-      setCurrentCharacterState(CharacterState.NORMAL);
-    }
-
-  }, [user?.currentSession]);
-
-  useEffect(() => {
-    if (currentIndex === START) {
+    if (row === 0 && col === 0) {
       setStart(Date.now());
     }
 
     if (currentTyped?.keyCode === 13) {
-      if (value[currentIndex] === "\n") {
-        setCurrentIndex((index) => index + 1);
+      if (value[row][col] === "\n") {
+        setCol(0);
         setCurrentTyped(null);
+        setRow(row + 1);
+        setCurrentCharacterState(CharacterState.NORMAL);
       }
     }
     else {
       if (currentTyped !== null && currentTyped !== undefined) {
-        let correct = Number(value[currentIndex]?.charCodeAt(0) === Number(currentTyped?.charCode));
+        let correct = Number(value[row][col]?.charCodeAt(0) === Number(currentTyped?.charCode));
 
         /** If correct */
         if (correct) {
-          setCurrentIndex(currentIndex + 1);
+          setCol(col + 1);
           setCurrentTyped(null);
           setCurrentCharacterState(CharacterState.NORMAL);
-          if (currentIndex === END_VALUES[user?.currentSession]) {
+          if (col === fileEnd) {
             let stop = Date.now();
             let duration = stop - start;
             let perMinute = duration / 60000;
@@ -101,10 +101,10 @@ const Editor: React.FC<Props> = (props) => {
             let cpm, wpm, payload;
 
             cpm = Math.trunc(
-              END_VALUES[user?.currentSession] / (perMinute)
+              fileEnd / (perMinute)
             );
             wpm = Math.trunc(
-              END_VALUES[user?.currentSession] / (5 * perMinute)
+              fileEnd / (5 * perMinute)
             );
 
             payload = {
@@ -122,7 +122,7 @@ const Editor: React.FC<Props> = (props) => {
         };
       }
     }
-  }, [currentIndex, currentTyped])
+  }, [col, currentTyped])
 
   const editorListener = () => {
     window.addEventListener("keypress", (event: KeyboardEvent) => {
@@ -139,30 +139,50 @@ const Editor: React.FC<Props> = (props) => {
     });
   };
 
-  const updateLine = <Text color="yellow.300" display="inline-block" fontSize="xl"> {line} </Text>
+  // const updateLine = () => {
+  //   setLine(line + 1);
+  // return <Text color="yellow.300" display="inline-block" fontSize="xl"> {line} </Text>
+  // }
 
-  // console.log(`characterState: ${currentCharacterState}`);
+  const transformValue = (content: string[]) => {
+    const transformedValue = [];
+
+    let line: string[] = [];
+    for (let character of content) {
+      line.push(character);
+      if (character === "\n") {
+        transformedValue.push(line);
+        line = [];
+      }
+    };
+    return transformedValue;
+  };
 
   return (
     <Box>
-      {value.map(((val, index) => (
-        <React.Fragment key={`#currentSession:${user?.currentSession}-value-${val}-${index}`} >
-          {index === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl"> {line} </Text>}
-          <Character
-            // key={`#currentSession:${user?.currentSession}-value-${val}-${index}`}
-            character={val || ""}
-            typed={currentIndex === index ? currentTyped : null}
-            currentIndex={currentIndex}
-            characterIndex={index}
-            setCurrentIndex={setCurrentIndex}
-            showCursor={currentIndex === index}
-            characterState={
-              currentIndex === index ? currentCharacterState :
-                currentIndex >= index ? CharacterState.CORRECT : CharacterState.NORMAL}
-          />
-          {val === "\n" && <Text color="yellow.300" display="inline-block" fontSize="xl"> {line} </Text>}
-        </React.Fragment>
-      )))}
+      {value.map(((array, rowIndex) => {
+        return array.map((val, colIndex) => (
+          <React.Fragment
+            key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
+          >
+            {colIndex === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl"> {rowIndex} </Text>}
+            <Character
+              // key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
+              character={val || ""}
+              typed={col === row ? currentTyped : null}
+              colIndex={colIndex}
+              rowIndex={rowIndex}
+              setCurrentIndex={setCol}
+              showCursor={col === colIndex && rowIndex === row}
+              characterState={
+                row === rowIndex && col === colIndex ? currentCharacterState : // cursor
+                  row > rowIndex ? CharacterState.CORRECT : // up  of  cursor
+                    row >= rowIndex && col >= colIndex ? CharacterState.CORRECT : CharacterState.NORMAL} // correct at left of cursor, normal on right of cursor
+            />
+          </React.Fragment>
+        )
+        )
+      }))}
     </Box>
   );
 };
