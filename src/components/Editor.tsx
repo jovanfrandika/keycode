@@ -22,9 +22,13 @@ const END_VALUES = TEST_VALUES.map((END) => {
   return END.length - 1;
 })
 
-const BLOCKED_KEYS = ["Shift"]
+const BLOCKED_KEYS = ["Shift"];
 
-const Editor: React.FC = () => {
+interface Props {
+  editorValue: string | undefined;
+};
+
+const Editor: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
 
   const [value, setValue] = useState<string[]>([]);
@@ -43,9 +47,17 @@ const Editor: React.FC = () => {
   const user = useSelector(selectUser);
 
   useEffect(() => {
-    setValue(TEST_VALUES[user?.currentSession].split(""));
     editorListener();
   }, [])
+
+  useEffect(() => {
+    // setValue(TEST_VALUES[user?.currentSession].split(""));
+    if (props.editorValue) {
+      const content = props.editorValue.split("");
+      // setValue(props.editorValue.split(""));
+      setValue(content);
+    }
+  }, [props.editorValue])
 
   useEffect(() => {
     if (user?.currentSession < TEST_VALUES.length) {
@@ -72,16 +84,11 @@ const Editor: React.FC = () => {
       }
     }
     else {
-      console.log("----------------");
-      console.log(`value: ${value}`);
-      console.log(`value[index]; ${value[currentIndex]}`)
-      console.log(`currentTyped: ${String.fromCharCode(currentTyped?.charCode || 0)}`);
-      console.log(`characterState: ${currentCharacterState}`);
-
       if (currentTyped !== null && currentTyped !== undefined) {
         let correct = Number(value[currentIndex]?.charCodeAt(0) === Number(currentTyped?.charCode));
+
         /** If correct */
-        if (Number(value[currentIndex]?.charCodeAt(0)) === Number(currentTyped?.charCode)) {
+        if (correct) {
           setCurrentIndex(currentIndex + 1);
           setCurrentTyped(null);
           setCurrentCharacterState(CharacterState.NORMAL);
@@ -99,7 +106,7 @@ const Editor: React.FC = () => {
             wpm = Math.trunc(
               END_VALUES[user?.currentSession] / (5 * perMinute)
             );
-            // DISPATCH EM ALL
+
             payload = {
               "cpm": cpm,
               "wpm": wpm,
@@ -110,11 +117,6 @@ const Editor: React.FC = () => {
         }
         /** If not correct */
         else if (!correct) {
-          // BERARTI MASK SINI
-          // console.log(`value: ${value}`);
-          // console.log(`value: ${value[currentIndex]?.charCodeAt(0)}`);
-          // console.log(`currentTyped: ${currentTyped?.charCode}`);
-
           setCurrentCharacterState(CharacterState.WRONG);
           setErrors((error) => error + 1);
         };
@@ -144,10 +146,10 @@ const Editor: React.FC = () => {
   return (
     <Box>
       {value.map(((val, index) => (
-        <>
-          {index === 0 && updateLine}
+        <React.Fragment key={`#currentSession:${user?.currentSession}-value-${val}-${index}`} >
+          {index === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl"> {line} </Text>}
           <Character
-            key={`#currentSession:${user?.currentSession}-value-${val}-${index}`}
+            // key={`#currentSession:${user?.currentSession}-value-${val}-${index}`}
             character={val || ""}
             typed={currentIndex === index ? currentTyped : null}
             currentIndex={currentIndex}
@@ -158,8 +160,8 @@ const Editor: React.FC = () => {
               currentIndex === index ? currentCharacterState :
                 currentIndex >= index ? CharacterState.CORRECT : CharacterState.NORMAL}
           />
-          {val === "\n" && updateLine}
-        </>
+          {val === "\n" && <Text color="yellow.300" display="inline-block" fontSize="xl"> {line} </Text>}
+        </React.Fragment>
       )))}
     </Box>
   );
