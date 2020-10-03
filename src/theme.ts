@@ -11,13 +11,15 @@ const customTheme = {
       800: "#153e75",
       700: "#2a69ac",
     },
+    light: "#F7AFC",
+    dark: "#4A5568",
     correct: "#68d391",
     wrong: "#f56565",
-    normal: "#F7FAFC",
+    normal: "#1A202C",
   },
   fonts: {
     heading: '"Avenir Next", sans-serif',
-    body: "system-ui, sans-serif",
+    body: "'Roboto Mono', monospace",
     mono: "Menlo, monospace",
   },
   fontSizes: {
@@ -41,7 +43,9 @@ const customTheme = {
     },
     correct: "#68d391",
     wrong: "#553c9a",
-    normal: "##171923",
+    normal: "#E8E8E8",
+    light: "#F7AFC",
+    dark: "#4A5568",
   },
 };
 

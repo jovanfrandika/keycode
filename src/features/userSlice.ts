@@ -2,6 +2,23 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fromApi, JWTKeyname } from "../axios";
 import { reduxStatus } from "../constants/reduxTypes";
 
+export const addSession = createAsyncThunk(
+  "user/addSession",
+  async ({ cpm, wpm, errors }: any) => {
+    return { cpm, wpm, errors };
+  }
+);
+
+export const updateError = createAsyncThunk(
+  "user/updateError",
+  async ({
+    currentSessionIndex,
+
+  }: any) => {
+    return { currentSessionIndex, };
+  }
+);
+
 export const login = createAsyncThunk(
   "user/login",
   async ({ email, password }: any) => {
@@ -30,10 +47,16 @@ export const userSlice = createSlice({
   initialState: {
     id: "",
     email: "",
+    currentError: 0,
+    currentSession: 0,
+    sessions: [],
     status: reduxStatus.idle,
   },
   reducers: {},
   extraReducers: {
+    [addSession.pending as any]: (state, action: any) => {
+      state.status = `addSession/${reduxStatus.loading}`;
+    },
     [login.pending as any]: (state, action: any) => {
       state.status = `login/${reduxStatus.loading}`;
     },
@@ -42,6 +65,11 @@ export const userSlice = createSlice({
     },
     [logout.pending as any]: (state, action: any) => {
       state.status = `logout/${reduxStatus.loading}`;
+    },
+    [addSession.fulfilled as any]: (state, action: any) => {
+      state.currentSession += 1;
+      state.sessions = state.sessions.concat(action.payload);
+      state.status = `addSession/${reduxStatus.success}`;
     },
     [login.fulfilled as any]: (state, action: any) => {
       const { id, email } = action.payload;
@@ -60,6 +88,9 @@ export const userSlice = createSlice({
 
       state.status = `logout/${reduxStatus.success}`;
     },
+    [addSession.rejected as any]: (state, action: any) => {
+      state.status = `addSession/${reduxStatus.error}`;
+    },
     [login.rejected as any]: (state, action: any) => {
       state.status = `login/${reduxStatus.error}`;
     },
@@ -74,8 +105,8 @@ export const userSlice = createSlice({
 
 export const selectUser = (state: any) => {
   return {
-    id: state.user.id,
-    email: state.user.email,
+    currentSession: state.user.currentSession,
+    sessions: state.user.sessions,
   };
 };
 

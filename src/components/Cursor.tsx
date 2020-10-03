@@ -23,6 +23,9 @@ const Cursor: React.FC<Props> = (props) => {
         setDisplay(!display);
       }, BLINK_SPEED)
     }
+    return () => {
+      clearTimeout(displayRef.current);
+    }
   }, [props.showCursor, display]);
 
   return (
@@ -30,13 +33,13 @@ const Cursor: React.FC<Props> = (props) => {
       <Box
         display="inline-block"
         background={display && props.showCursor ? props.characterState.toLowerCase() : "none"}
-        h="18px"
-        w="12px"
+        h="26px"
+        w="12.5px"
         textAlign="center"
+        verticalAlign="center"
       >
         {props.character !== "\n" && props.children}
       </Box>
-
       {props.character === "\n" && <Box />}
     </>
   )

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Text } from "@chakra-ui/core";
 
@@ -22,17 +22,23 @@ interface Props {
 }
 
 const Character: React.FC<Props> = React.memo((props) => {
-  // const [characterState] = useState(CharacterState.NORMAL)
 
   return (
-    <Cursor showCursor={props.showCursor} character={props.character} characterState={props.characterState}>
-      <Text color={props.characterState.toLowerCase()}>
+    <Cursor
+      showCursor={props.showCursor}
+      character={props.character}
+      characterState={props.characterState}
+    >
+      <Text fontSize="xl" color={props.characterState.toLowerCase()}>
         {props.character}
       </Text>
     </Cursor>
   );
 },
-  (prevProps, nextProps) => prevProps.typed?.charCode === nextProps.typed?.charCode && prevProps.showCursor === nextProps.showCursor
+  (prevProps, nextProps) =>
+    prevProps.typed?.charCode === nextProps.typed?.charCode &&
+    prevProps.showCursor === nextProps.showCursor &&
+    prevProps.characterState === nextProps.characterState
 );
 
 export default Character;

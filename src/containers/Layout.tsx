@@ -7,9 +7,9 @@ const Layout = (props: any) => {
     <>
       <Flex
         flexDirection="row"
-        alignItems="center"
+        // alignItems="center"
         justifyContent="center"
-        bg="tomato"
+        bg="gray.700"
         height={["25rem", "50rem", "75rem", "100rem"]}
         width={["100%"]}
       >
