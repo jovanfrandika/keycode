@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Flex, Box, Text } from "@chakra-ui/core";
 import { useSelector } from "react-redux";
@@ -9,12 +9,17 @@ import Character from "./Character";
 import { addSession, selectUser, selectFileContent } from "../features/userSlice";
 
 const BLOCKED_KEYS = ["Shift"];
-const LIMIT = 4;
+const LIMIT = 3;
 
-const Editor: React.FC = () => {
+interface Props {
+  isListening: boolean;
+  setIsListening: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Editor: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const { currentSession } = useSelector(selectUser);
-  const { fileContent, fileEnd } = useSelector(selectFileContent);
+  const { fileContent } = useSelector(selectFileContent);
 
   const [content, setContent] = useState<string>("")
   const [value, setValue] = useState<string[][]>([]);
@@ -39,47 +44,75 @@ const Editor: React.FC = () => {
   const [screenCursor, setScreenCursor] = useState<number>(0);
 
   useEffect(() => {
-    editorListener();
-  }, [])
-
-  useEffect(() => {
     if (fileContent) {
       setContent(fileContent);
+      resetEditor();
+
       const info = parseRowInformation(fileContent);
       setRowInformation(info);
-      console.log(info);
       setValue(transformValue(info.length < LIMIT ? fileContent : fileContent.slice(0, info[LIMIT].location)));
     }
   }, [fileContent])
 
+  /* 
+   * Handle next screen 
+   */
   useEffect(() => {
-    if (screenCursor && rowInformation[screenCursor]) {
+    console.log(`screenCursor: ${screenCursor}`);
+    // chizuru best waiuf
+    if (screenCursor !== undefined && rowInformation[screenCursor] !== undefined) {
+      let newValue: string[][];
       setCurrentTyped(null);
-      setStart(0);
-      setErrors(0);
-      setCol(0);
-      setRow(0);
-      setCurrentCharacterState(CharacterState.NORMAL);
+      resetEditor();
 
-      // if () {
-
-      // };
-
-      const con = content.slice(
-        rowInformation[screenCursor]?.location - 1,
-        rowInformation[screenCursor + LIMIT > rowInformation.length ? rowInformation.length : screenCursor + LIMIT]?.location
-      )
-
-      setValue(transformValue(con.split("")));
-      // };
+      if (screenCursor === 0) {
+        console.log('masuk 1')
+        newValue = transformValue(content.length < LIMIT ? fileContent : fileContent.slice(0, rowInformation[LIMIT].location));
+      }
+      else {
+        console.log(
+          'masuk 2'
+        )
+        newValue = transformValue(content.slice(
+          rowInformation[screenCursor]?.location - 1,
+          rowInformation[
+            screenCursor + LIMIT > rowInformation.length ?
+              rowInformation.length :
+              screenCursor + LIMIT
+          ]?.location
+        ).split(""));
+      }
+      console.log(newValue);
+      setValue(newValue);
     }
   }, [screenCursor]);
 
 
   useEffect(() => {
-    if (row === 0 && col === 0) {
+    /**
+     * If screen is the last screen in the file.
+     */
+
+    if (
+      screenCursor === rowInformation.length + 1 - LIMIT
+    ) {
+      /**
+       * If in the last screen, row and col is the last row and col in the screen.
+       */
+      if (row === LIMIT - 1) {
+        // End of the file and the screen, resets back to the beginning.
+        calculateStatistics();
+        setScreenCursor(0);
+      }
+    }
+    /**
+     * If screen just initialized and user just started typing
+     */
+    if (row === 0 && col === 0 && props.isListening) {
       setStart(Date.now());
     }
+
+
 
     if (currentTyped?.keyCode === 13) {
       if (value[row][col] === "\n") {
@@ -90,24 +123,9 @@ const Editor: React.FC = () => {
         /*
             End of screen
          */
-
         if (row === LIMIT - 1) {
+          calculateStatistics();
           setScreenCursor(screenCursor + LIMIT);
-          let totalCharacters = 0;
-          for (let i = screenCursor; i < screenCursor + LIMIT; i++) {
-            totalCharacters += rowInformation[i].col;
-          }
-          let duration = (Date.now() - start) / 60000;
-          let wpm, cpm;
-          cpm = Math.round(totalCharacters / duration);
-          wpm = cpm / 5;
-
-          const payload = {
-            "cpm": cpm,
-            "wpm": wpm,
-            "errors": errors,
-          }
-          dispatch(addSession(payload));
 
         };
 
@@ -122,8 +140,6 @@ const Editor: React.FC = () => {
           setCol(col + 1);
           setCurrentTyped(null);
           setCurrentCharacterState(CharacterState.NORMAL);
-          if (rowInformation[screenCursor].row === row && rowInformation[screenCursor].col === col) {
-          }
         }
         else if (!correct) {
           setCurrentCharacterState(CharacterState.WRONG);
@@ -133,20 +149,30 @@ const Editor: React.FC = () => {
     }
   }, [row, col, currentTyped, value])
 
-  const editorListener = () => {
-    window.addEventListener("keypress", (event: KeyboardEvent) => {
-      BLOCKED_KEYS.forEach((key) => {
-        if (event.charCode === 32 || event.key === "Enter" || event.key === "'" || event.key === "/" || event.key === "Tab") {
-          event.preventDefault();
-        };
-        setCurrentTyped({
-          charCode: event.charCode,
-          keyCode: event.keyCode,
-          key: event.key
-        })
+  useEffect(() => {
+    resetEditor();
+    if (props.isListening) {
+      window.addEventListener("keypress", handleKeypress);
+    }
+    else {
+      window.removeEventListener("keypress", handleKeypress, false);
+      window.removeEventListener("keypress", handleKeypress, true);
+    }
+  }, [props.isListening])
+
+  const handleKeypress = useCallback((event: KeyboardEvent) => {
+
+    BLOCKED_KEYS.forEach((key) => {
+      if (event.charCode === 32 || event.key === "Enter" || event.key === "'" || event.key === "/" || event.key === "Tab") {
+        event.preventDefault();
+      };
+      setCurrentTyped({
+        charCode: event.charCode,
+        keyCode: event.keyCode,
+        key: event.key
       })
-    });
-  };
+    })
+  }, []);
 
   const transformValue = (content: string[]) => {
     const transformedValue = [];
@@ -188,9 +214,43 @@ const Editor: React.FC = () => {
     return slices;
   };
 
+  const resetEditor = () => {
+    setCurrentTyped(null);
+    setStart(0);
+    setErrors(0);
+    setCol(0);
+    setRow(0);
+    setCurrentCharacterState(CharacterState.NORMAL);
+  };
+
+  const calculateStatistics = () => {
+    let totalCharacters = 0;
+
+    for (
+      let i = screenCursor;
+      i < (screenCursor + LIMIT > rowInformation.length ?
+        rowInformation.length :
+        screenCursor + LIMIT);
+      i++
+    ) {
+      totalCharacters += rowInformation[i].col;
+    }
+
+    let duration = (Date.now() - start) / 60000;
+    let wpm, cpm;
+    cpm = Math.round(totalCharacters / duration);
+    wpm = cpm / 5;
+
+    const payload = {
+      "cpm": cpm,
+      "wpm": wpm,
+      "errors": errors,
+    }
+    dispatch(addSession(payload));
+  };
 
   return (
-    <Box>
+    <Box onClick={() => props.setIsListening((isListening) => !isListening)} opacity={props.isListening ? 1 : 0.5}>
       {value.map(((array, rowIndex) => {
         return (
           <Flex

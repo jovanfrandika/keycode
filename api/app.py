@@ -21,13 +21,32 @@ def home():
 @app.route("/file")
 def download_file():
     url = request.args.get("url")
-    github_file = requests.get(url)
+    sha = request.args.get("sha")
+    github_file = requests.get(url,
+                               auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
+    # github_file = requests.get(f"{baseURL}/repos/repositories?q={query}&sort=stars&order=desc",
+    #   auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
     content = github_file.json()["content"]
     decode = base64.b64decode(content)
     return decode
 
 
-@ app.route("/search/repo")
+@app.route("/tree")
+def search_trees(treeUrl=""):
+    url = request.args.get("url")
+    print(url)
+    if url:
+        print(url)
+        tree_search = requests.get(url,
+                                   auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
+    else:
+        print(treeUrl)
+        tree_search = requests.get(treeUrl,
+                                   auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
+    return tree_search.json()
+
+
+@app.route("/search/repo")
 def search_repositories():
     query = request.args.get("q")
     search = requests.get(f"{baseURL}/search/repositories?q={query}&sort=stars&order=desc",
@@ -48,16 +67,19 @@ def search_files():
 
     # 2. Use the latest commit SHA to get the tree SHA
     # GET /repos/:owner/:repo/git/commits/:sha
-    sha_search = requests.get(f"{baseURL}/repos/{owner}/{repo}/git/commits/{latest_commit_sha}",
-                              auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
-    tree_sha = sha_search.json()["tree"]["sha"]
+    tree_search = requests.get(f"{baseURL}/repos/{owner}/{repo}/git/commits/{latest_commit_sha}",
+                               auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
+    tree_sha = tree_search.json()["tree"]["sha"]
+    tree_url = tree_search.json()["tree"]["url"]
 
     # 3. Use the tree SHA to get the file structure
+    # 3. Use the tree URL to get the file structure
     # GET /repos/:owner/:repo/git/trees/:sha
-    tree_search = requests.get(f"{baseURL}/repos/{owner}/{repo}/git/trees/{tree_sha}",
-                               auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
-    # files = tree_search.json()["tree"]
-    return tree_search.json()
+    # tree_search = requests.get(tree_url,
+    #                            # tree_search = requests.get(f"{baseURL}/repos/{owner}/{repo}/git/trees/{tree_sha}",
+    #                            auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
+    # return tree_search.json()
+    return search_trees(tree_url)
 
 
 if __name__ == "__main__":
