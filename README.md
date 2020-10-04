@@ -1,44 +1,36 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Keycodes
 
-## Available Scripts
+![logo](https://raw.githubusercontent.com/uriella/keycode/with-chakra-ui/src/assets/images/keycode_with_background.png)
 
-In the project directory, you can run:
 
-### `yarn start`
+**Keycodes** is an application that was made to help programmers **boost their typing speed** by actually **typing real codes** instead of random examples. By using real codes from **public code repositories** that you can search in Github, you can learn to touch type in coding better where there are tons of rarely typed symbols.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### Technologies & Stacks
+- [React.js](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+- [Github API](https://developer.github.com/v3/)
 
-### `yarn test`
+### Inspiration
+Steven and Jovan tried to practice touch typing to improve their typing speed but it didn't end up well because in most programming languages have their own unique syntax with symbols in the keyboard that you probably won't ever use when typing normal sentences. That's why Steven and Jovan wanted a way for programmers & everyone to practice touch typing relative to the context of coding.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### What it does
+Helping programmers to learn touch typing in the context of writing code, most touch-typing apps just provide random examples with no context. With Keycodes you can actually choose a real example also with the preferred programming language, and so on.
 
-### `yarn build`
+### How I built it
+The web app was mostly built in the frontend-part for this hackathon, we built this with **React.js & TypeScript** because it's the most popular frontend framework that is ready for productiion, we also deployed it to **Netlify**. To fetch the repositories from Github we need to fetch the public **Github Api** using our auxiliary backend API with **Flask** that is deployed on Heroku.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Challenges I ran into
+- Complex react concepts such as React.memo to avoid unnecessary re-rendering
+- Reading the API documentation for Github
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+### What's next for Keycodes
+- Implementing users model in the backend
+- Implementing typeracing with other people online
+- Implementing statistics of learning progress
+- Implementing bookmarks of favorite repositories
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Contributors
+- [Jovan Frandika](https://github.com/uriella)
+- [Steven Hansel](https://github.com/ShinteiMai)
