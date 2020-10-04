@@ -144,8 +144,10 @@ export const userSlice = createSlice({
       state.fileTree = {
         ...state.fileTree,
         files: action.payload.files,
-        URLs: state.fileTree.URLs.concat(action.payload.URL),
-        pathname: state.fileTree.pathname.concat(action.payload.pathname)
+        URLs: action.payload.URL,
+        pathname: action.payload.pathname
+        // URLs: state.fileTree.URLs.concat(action.payload.URL),
+        // pathname: state.fileTree.pathname.concat(action.payload.pathname)
       }
       state.status = `getFilesFromRepository/${reduxStatus.success}`;
     },
