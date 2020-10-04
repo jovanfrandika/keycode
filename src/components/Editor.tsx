@@ -6,10 +6,10 @@ import { useSelector } from "react-redux";
 import { CharacterState } from "../constants/enums";
 
 import Character from "./Character";
-import { addSession, selectUser, selectFileContent } from "../features/userSlice";
+import { addSession, selectUser, selectFile } from "../features/userSlice";
+import { SCREEN_LIMIT } from "../constants/index";
 
 const BLOCKED_KEYS = ["Shift"];
-const LIMIT = 3;
 
 interface Props {
   isListening: boolean;
@@ -19,7 +19,7 @@ interface Props {
 const Editor: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const { currentSession } = useSelector(selectUser);
-  const { fileContent } = useSelector(selectFileContent);
+  const { file } = useSelector(selectFile);
 
   const [content, setContent] = useState<string>("")
   const [value, setValue] = useState<string[][]>([]);
@@ -44,47 +44,44 @@ const Editor: React.FC<Props> = (props) => {
   const [screenCursor, setScreenCursor] = useState<number>(0);
 
   useEffect(() => {
-    if (fileContent) {
-      setContent(fileContent);
+    if (file) {
+      setContent(file.content);
       resetEditor();
 
-      const info = parseRowInformation(fileContent);
+      const info = parseRowInformation(file.content);
       setRowInformation(info);
-      setValue(transformValue(info.length < LIMIT ? fileContent : fileContent.slice(0, info[LIMIT].location)));
+      setValue(transformValue(info.length < SCREEN_LIMIT ? file.content : file.content.slice(0, info[SCREEN_LIMIT].location)));
     }
-  }, [fileContent])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file.content])
 
   /* 
    * Handle next screen 
    */
   useEffect(() => {
-    console.log(`screenCursor: ${screenCursor}`);
-    // chizuru best waiuf
     if (screenCursor !== undefined && rowInformation[screenCursor] !== undefined) {
       let newValue: string[][];
       setCurrentTyped(null);
       resetEditor();
 
       if (screenCursor === 0) {
-        console.log('masuk 1')
-        newValue = transformValue(content.length < LIMIT ? fileContent : fileContent.slice(0, rowInformation[LIMIT].location));
+        newValue = transformValue(content.length < SCREEN_LIMIT ? file.content : file.content.slice(0, rowInformation[SCREEN_LIMIT].location));
       }
       else {
-        console.log(
-          'masuk 2'
-        )
         newValue = transformValue(content.slice(
-          rowInformation[screenCursor]?.location - 1,
+          rowInformation[screenCursor]?.location,
           rowInformation[
-            screenCursor + LIMIT > rowInformation.length ?
+            screenCursor + SCREEN_LIMIT > rowInformation.length ?
               rowInformation.length :
-              screenCursor + LIMIT
+              screenCursor + SCREEN_LIMIT
           ]?.location
         ).split(""));
       }
-      console.log(newValue);
       setValue(newValue);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screenCursor]);
 
 
@@ -92,19 +89,28 @@ const Editor: React.FC<Props> = (props) => {
     /**
      * If screen is the last screen in the file.
      */
-
+    // console.log('masuk');
+    // console.log(`screenCursor: ${screenCursor}`);
+    // console.log(`rowInformation.length: ${rowInformation.length}`);
+    // console.log(`rowInformation.length - screen_limit: ${rowInformation.length - SCREEN_LIMIT}`);
+    const checkScreen = rowInformation.length - SCREEN_LIMIT < rowInformation.length ? SCREEN_LIMIT : rowInformation.length - SCREEN_LIMIT;
     if (
-      screenCursor === rowInformation.length + 1 - LIMIT
+      screenCursor === checkScreen
     ) {
+      console.log('masuk 1');
       /**
        * If in the last screen, row and col is the last row and col in the screen.
        */
-      if (row === LIMIT - 1) {
+      if (row === rowInformation.length - screenCursor - 1 &&
+        col === rowInformation[rowInformation.length - 1].col
+      ) {
+        console.log('masuk 2');
         // End of the file and the screen, resets back to the beginning.
         calculateStatistics();
         setScreenCursor(0);
       }
     }
+    // else {
     /**
      * If screen just initialized and user just started typing
      */
@@ -121,11 +127,11 @@ const Editor: React.FC<Props> = (props) => {
         setRow(row + 1);
 
         /*
-            End of screen
+         *  End of screen
          */
-        if (row === LIMIT - 1) {
+        if (row === SCREEN_LIMIT - 1) {
           calculateStatistics();
-          setScreenCursor(screenCursor + LIMIT);
+          setScreenCursor(screenCursor + SCREEN_LIMIT);
 
         };
 
@@ -147,6 +153,10 @@ const Editor: React.FC<Props> = (props) => {
         };
       }
     }
+
+    // }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row, col, currentTyped, value])
 
   useEffect(() => {
@@ -158,6 +168,8 @@ const Editor: React.FC<Props> = (props) => {
       window.removeEventListener("keypress", handleKeypress, false);
       window.removeEventListener("keypress", handleKeypress, true);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isListening])
 
   const handleKeypress = useCallback((event: KeyboardEvent) => {
@@ -200,7 +212,7 @@ const Editor: React.FC<Props> = (props) => {
     for (let i = 0; i < file.length; i++) {
       if (file[i] === "\n") {
         slices.push({
-          location: i,
+          location: i - col,
           col,
           row
         });
@@ -228,9 +240,9 @@ const Editor: React.FC<Props> = (props) => {
 
     for (
       let i = screenCursor;
-      i < (screenCursor + LIMIT > rowInformation.length ?
+      i < (screenCursor + SCREEN_LIMIT > rowInformation.length ?
         rowInformation.length :
-        screenCursor + LIMIT);
+        screenCursor + SCREEN_LIMIT);
       i++
     ) {
       totalCharacters += rowInformation[i].col;
@@ -250,38 +262,47 @@ const Editor: React.FC<Props> = (props) => {
   };
 
   return (
-    <Box onClick={() => props.setIsListening((isListening) => !isListening)} opacity={props.isListening ? 1 : 0.5}>
-      {value.map(((array, rowIndex) => {
-        return (
-          <Flex
-            key={`#currentSession:${currentSession}-line-${rowIndex}-`}
-            flexDirection="row"
-            alignItems="center"
-          >
-            {array.map((val, colIndex) => (
-              <React.Fragment
-                key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
-              >
-                {colIndex === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl" w={12}> {screenCursor + rowIndex} </Text>}
-                <Character
-                  character={val || ""}
-                  typed={col === row ? currentTyped : null}
-                  colIndex={colIndex}
-                  rowIndex={rowIndex}
-                  setCurrentIndex={setCol}
-                  showCursor={col === colIndex && rowIndex === row}
-                  characterState={
-                    row === rowIndex && col === colIndex ? currentCharacterState : // cursor
-                      row > rowIndex ? CharacterState.CORRECT : // up  of  cursor
-                        row >= rowIndex && col >= colIndex ? CharacterState.CORRECT : CharacterState.NORMAL} // correct at left of cursor, normal on right of cursor
-                />
-              </React.Fragment>
-            )
-            )}
-          </Flex>
-        );
-      }))}
-    </Box>
+    <>
+      <Box onClick={() => props.setIsListening((isListening) => !isListening)} opacity={props.isListening ? 1 : 0.6}>
+        {value.map(((array, rowIndex) => {
+          return (
+            <Flex
+              key={`#currentSession:${currentSession}-line-${rowIndex}-`}
+              flexDirection="row"
+              alignItems="center"
+            >
+              {array.map((val, colIndex) => (
+                <React.Fragment
+                  key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
+                >
+                  {colIndex === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl" w={12}> {screenCursor + rowIndex} </Text>}
+                  <Character
+                    character={val || ""}
+                    typed={col === row ? currentTyped : null}
+                    colIndex={colIndex}
+                    rowIndex={rowIndex}
+                    setCurrentIndex={setCol}
+                    showCursor={col === colIndex && rowIndex === row}
+                    characterState={
+                      row === rowIndex && col === colIndex ? currentCharacterState : // cursor
+                        row > rowIndex ? CharacterState.CORRECT : // up  of  cursor
+                          row >= rowIndex && col >= colIndex ? CharacterState.CORRECT : CharacterState.NORMAL} // correct at left of cursor, normal on right of cursor
+                  />
+                </React.Fragment>
+              )
+              )}
+            </Flex>
+          );
+        }))}
+      </Box>
+      {!props.isListening && (
+        <Box color="normal" textAlign="center" mx="auto" fontWeight="bold">
+          <Text>Click to activate...</Text>
+        </Box>
+      )}
+
+    </>
+
   );
 };
 

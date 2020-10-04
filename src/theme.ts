@@ -42,7 +42,7 @@ const customTheme = {
       700: "#2a69ac",
     },
     correct: "#68d391",
-    wrong: "#553c9a",
+    wrong: "#f56565",
     normal: "#E8E8E8",
     light: "#F7AFC",
     dark: "#4A5568",

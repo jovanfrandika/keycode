@@ -3,33 +3,24 @@ import { reduxStatus } from "../constants/reduxTypes";
 import { HTTP_METHODS } from "../constants/enums";
 import axios from "../axios";
 
-const testValue = `aaa
-bbb
-ccc
-ddd
-eee
-fff
-ggg
-hhh
-iii
-jjj
-kkk
-`;
-
 export const getFileContent = createAsyncThunk(
   "user/getFileContent",
-  async ({ url }: { url: string }) => {
+  async ({ url, path }: { url: string, path: string }) => {
     const response = await axios({
       method: HTTP_METHODS.GET,
       url: `/file?url=${url}`
     })
-    const fileContent = String(response.data);
-    return fileContent;
+    const content = String(response.data);
+    const data = {
+      content: content,
+      path: path,
+    }
+    return data;
   });
 
 export const getFilesFromTrees = createAsyncThunk(
   "user/getFilesFromTrees",
-  async ({ url, pop }: { url: string, pop?: boolean }) => {
+  async ({ url, path, pop }: { url: string, path: string, pop?: boolean }) => {
     const response = await axios({
       method: HTTP_METHODS.GET,
       url: `/tree?url=${url}`
@@ -44,6 +35,7 @@ export const getFilesFromTrees = createAsyncThunk(
     const data = {
       files: fetchedFiles,
       URL: response.data.url,
+      pathname: path,
       pop: pop,
     }
     return data;
@@ -66,6 +58,7 @@ export const getFilesFromRepository = createAsyncThunk(
     const data = {
       files: fetchedFiles,
       URL: [response.data.url],
+      pathname: [repo],
     }
     return data;
   });
@@ -90,7 +83,10 @@ export const updateError = createAsyncThunk(
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    fileContent: testValue,
+    file: {
+      content: "test",
+      path: "test"
+    },
     fileTree: {
       files: [],
       URLs: [],
@@ -120,7 +116,7 @@ export const userSlice = createSlice({
       state.status = `getFileContent/${reduxStatus.loading}`;
     },
     [getFileContent.fulfilled as any]: (state, action: any) => {
-      state.fileContent = action.payload;
+      state.file = action.payload;
       state.status = `getFileContent/${reduxStatus.success}`;
     },
     [getFileContent.rejected as any]: (state, action: any) => {
@@ -129,15 +125,15 @@ export const userSlice = createSlice({
 
     [getFilesFromTrees.pending as any]: (state, action: any) => { },
     [getFilesFromTrees.fulfilled as any]: (state, action: any) => {
-      // const URLsLen = state.fileTree.URLs.length;
-      if (action.payload.pop)
+      if (action.payload.pop) {
         state.fileTree.URLs.pop();
-      else
+        state.fileTree.pathname.pop();
+      }
+      else {
         state.fileTree.URLs = state.fileTree.URLs.concat(action.payload.URL);
+        state.fileTree.pathname = state.fileTree.pathname.concat(action.payload.pathname);
+      }
 
-      console.log("----");
-      console.log("a: " + state.fileTree.URLs);
-      console.log("b: " + action.payload.URL);
       state.fileTree.files = action.payload.files;
       state.status = `getFilesFromTrees/${reduxStatus.success}`;
     },
@@ -148,9 +144,9 @@ export const userSlice = createSlice({
       state.fileTree = {
         ...state.fileTree,
         files: action.payload.files,
-        URLs: state.fileTree.URLs.concat(action.payload.URL)
+        URLs: state.fileTree.URLs.concat(action.payload.URL),
+        pathname: state.fileTree.pathname.concat(action.payload.pathname)
       }
-      // state.fileTree = state.sessions.concat(action.payload);
       state.status = `getFilesFromRepository/${reduxStatus.success}`;
     },
     [getFilesFromRepository.rejected as any]: (state, action: any) => { },
@@ -174,9 +170,9 @@ export const selectUserStatus = (state: any) => {
   };
 };
 
-export const selectFileContent = (state: any) => {
+export const selectFile = (state: any) => {
   return {
-    fileContent: state.user.fileContent,
+    file: state.user.file,
   };
 };
 

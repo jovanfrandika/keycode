@@ -21,7 +21,6 @@ def home():
 @app.route("/file")
 def download_file():
     url = request.args.get("url")
-    sha = request.args.get("sha")
     github_file = requests.get(url,
                                auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
     # github_file = requests.get(f"{baseURL}/repos/repositories?q={query}&sort=stars&order=desc",
@@ -34,13 +33,10 @@ def download_file():
 @app.route("/tree")
 def search_trees(treeUrl=""):
     url = request.args.get("url")
-    print(url)
     if url:
-        print(url)
         tree_search = requests.get(url,
                                    auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
     else:
-        print(treeUrl)
         tree_search = requests.get(treeUrl,
                                    auth=HTTPBasicAuth(os.getenv('GITHUB_CLIENT_ID'), os.getenv('GITHUB_CLIENT_SECRET')))
     return tree_search.json()
@@ -72,7 +68,6 @@ def search_files():
     tree_sha = tree_search.json()["tree"]["sha"]
     tree_url = tree_search.json()["tree"]["url"]
 
-    # 3. Use the tree SHA to get the file structure
     # 3. Use the tree URL to get the file structure
     # GET /repos/:owner/:repo/git/trees/:sha
     # tree_search = requests.get(tree_url,

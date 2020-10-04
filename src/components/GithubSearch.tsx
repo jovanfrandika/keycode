@@ -1,51 +1,51 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "../axios";
 
-import { useDispatch } from "react-redux";
 import { HTTP_METHODS } from "../constants/enums";
 import { FETCH_TIMEOUT } from "../constants/index";
 import {
-  Flex,
   Box,
-  Input,
-  Text,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
   useDisclosure,
-  Button
+  Button,
+  Spinner
 } from "@chakra-ui/core";
 
 import { Repository } from "../constants/types";
-import { getFilesFromRepository } from "../features/userSlice";
 
 import Directory from "./Directory";
-
-
+import GithubInput from "./GithubInput";
+import GithubRepositories from "./GithubRepositories";
 
 const GithubSearch: React.FC = (props) => {
-  const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [value, setValue] = useState<string>("");
   const [repositories, setRepositories] = useState<Repository[]>([]);
-
+  const [isAutoCompleted, setIsAutoCompleted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const fetchRepoRef: any = useRef();
 
   useEffect(() => {
     clearTimeout(fetchRepoRef.current);
     fetchRepoRef.current = setTimeout(() => {
-      if (value) {
+      if (value && !isAutoCompleted) {
         searchRepo(value);
       }
       else {
         setRepositories([]);
+        setIsAutoCompleted(false);
       }
     }, FETCH_TIMEOUT);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const searchRepo = async (query: string) => {
+    setIsLoading(true);
     const response = await axios({
       method: HTTP_METHODS.GET,
       url: `search/repo?q=${query}`,
@@ -58,11 +58,12 @@ const GithubSearch: React.FC = (props) => {
       };
     });
     setRepositories(fetchedRepos);
+    setIsLoading(false);
   };
 
   return (
     <>
-      <Button onClick={onOpen}>Search</Button>
+      <Button onClick={onOpen} color="gray.700">Search @Github</Button>
       <Modal
         blockScrollOnMount={true}
         isOpen={isOpen}
@@ -80,42 +81,18 @@ const GithubSearch: React.FC = (props) => {
         >
           <ModalBody>
             <Box mt="3rem" w={["50rem", "40rem", "30rem"]} pb="5rem" mx="auto" color="normal" position="relative">
-              <Box mx="auto" textAlign="center">
-                <Text fontSize="2xl" mb={6}>Search Github Repository</Text>
-                <Input
-                  color="#000"
-                  value={value}
-                  onChange={(event: React.FormEvent<HTMLInputElement>) => {
-                    setValue(String(event.currentTarget.value));
-                  }}
-                />
-              </Box>
-              <Flex
-                position="absolute"
-                zIndex={1}
-                flexDirection="column"
-                bg="white"
-                pb={repositories.length ? "1rem" : ""}
-                borderRadius="0 0 0.5rem 0.5rem"
-                w="100%"
-              >
-                {repositories.map((repo, index) => (
-                  <Flex key={`${repo.name}-${index}`} cursor="pointer" onClick={() => {
-                    dispatch(getFilesFromRepository({
-                      owner: repo.owner,
-                      repo: repo.name,
-                    }));
-                    setRepositories([]);
-                  }}>
-                    <Text ml="1rem" color="black">
-                      {repo.name}
-
-                    </Text>
-                  </Flex>
-                ))}
-              </Flex>
+              <GithubInput value={value} setValue={setValue} />
+              <GithubRepositories
+                repositories={repositories}
+                setRepositories={setRepositories}
+                value={value}
+                setValue={setValue}
+                setIsAutoCompleted={setIsAutoCompleted}
+              />
               <Directory closeModal={onClose} />
-
+              <Box textAlign="center" mx="auto">
+                {isLoading && <Spinner size="lg" />}
+              </Box>
             </Box >
           </ModalBody>
         </ModalContent>

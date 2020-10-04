@@ -10,7 +10,8 @@ const Layout = (props: any) => {
         // alignItems="center"
         justifyContent="center"
         bg="gray.700"
-        height={["25rem", "50rem", "75rem", "100rem"]}
+        // height={["25rem", "50rem", "75rem", "100rem"]}
+        minHeight="100vh"
         width={["100%"]}
       >
         {props.children}

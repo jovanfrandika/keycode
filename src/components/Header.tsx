@@ -1,12 +1,29 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
-import { Box } from "@chakra-ui/core";
+import { Text } from "@chakra-ui/core";
+import { selectFiles, selectFile } from "../features/userSlice";
 
 const Header: React.FC = () => {
-  return (
-    <Box>
+  const { fileTree } = useSelector(selectFiles);
+  const { file } = useSelector(selectFile);
 
-    </Box>
+  return (
+    <>
+      <Text color="white" display="inline-block" mr="1.4rem">
+        Current Session:
+      </Text>
+      {fileTree?.pathname.map((path: string) => {
+        return (
+          <Text key={`path-${path}`} color="normal" display="inline-block">
+            {path}/
+          </Text>
+        )
+      })}
+      <Text color="white" display="inline-block">
+        {file.path}
+      </Text>
+    </>
   )
 };
 

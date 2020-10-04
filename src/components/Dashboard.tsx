@@ -7,25 +7,34 @@ import Statistic from "./Statistic";
 
 import { selectUser } from "../features/userSlice";
 
-// import { current } from "@reduxjs/toolkit";
-
 const Dashboard = () => {
 
   const user = useSelector(selectUser);
+
+  const statusSelector = (index: number) => {
+    return user?.currentSession ?
+      user?.sessions[user?.currentSession - index] ?
+        user?.sessions[user?.currentSession - index]
+        : 0
+      : 0;
+  };
 
   return (
     <Flex color="normal" justifyContent="space-evenly" width="100%">
       <Statistic
         title="WPM"
-        amount={user?.currentSession ? user?.sessions[user?.currentSession - 1].wpm : 0}
+        amount={statusSelector(1).wpm}
+        previousAmount={statusSelector(2).wpm}
       />
       <Statistic
         title="CPM"
-        amount={user?.currentSession ? user?.sessions[user?.currentSession - 1].cpm : 0}
+        amount={statusSelector(1).cpm}
+        previousAmount={statusSelector(2).cpm}
       />
       <Statistic
         title="Errors"
-        amount={user?.currentSession ? user?.sessions[user?.currentSession - 1].errors : 0}
+        amount={statusSelector(1).errors}
+        previousAmount={statusSelector(2).errors}
       />
     </Flex>
   );
