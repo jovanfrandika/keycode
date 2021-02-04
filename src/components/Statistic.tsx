@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-import { Flex, Text } from "@chakra-ui/core";
-
 interface Props {
   title: string;
   amount: number;
@@ -24,26 +22,26 @@ const Statistic: React.FC<Props> = (props) => {
   }, [gain]);
 
   return (
-    <Flex justifyContent="space-between" alignItems="center" w="7.5rem">
-      <Flex flexDirection="column" justifyContent="space-between">
-        <Text fontSize="xl" opacity={0.8}>
+    <div className='flex justify-between items-center w-8'>
+      <div className='flex flex-col justify-between'>
+        <p className='font-xl opacity-80'>
           {props.title}:
-        </Text>
-        <Text mt="1rem">
+        </p>
+        <p className='mt-1'>
           Gain:
-        </Text>
+        </p>
 
-      </Flex>
-      <Flex flexDirection="column" alignItems="center" justifyContent="space-between" mb="1rem">
-        <Text fontSize="4xl" fontWeight="bold" opacity={0.8} mb=".8rem">
+      </div>
+      <div className='flex flex-col justify-between items-center mb-1'>
+        <p className='mb-1 font-4xl font-bold opacity-80'>
           {props.amount || 0}
-        </Text>
-        <Text color={color}>
+        </p>
+        <p className={`text-character-{color}`}>
           {gain > 0 && "+"}{gain}
-        </Text>
+        </p>
 
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   );
 };
 

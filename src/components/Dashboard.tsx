@@ -1,8 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { Flex } from "@chakra-ui/core";
-
 import Statistic from "./Statistic";
 
 import { selectUser } from "../features/userSlice";
@@ -20,7 +18,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Flex color="normal" justifyContent="space-evenly" width="100%">
+    <div className='flex text-character-normal justify-evenly w-full' >
       <Statistic
         title="WPM"
         amount={statusSelector(1).wpm}
@@ -36,7 +34,7 @@ const Dashboard = () => {
         amount={statusSelector(1).errors}
         previousAmount={statusSelector(2).errors}
       />
-    </Flex>
+    </div>
   );
 };
 

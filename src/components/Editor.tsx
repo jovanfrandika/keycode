@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { Flex, Box, Text } from "@chakra-ui/core";
 import { useSelector } from "react-redux";
 
 import { CharacterState } from "../constants/enums";
@@ -263,19 +262,18 @@ const Editor: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Box onClick={() => props.setIsListening((isListening) => !isListening)} opacity={props.isListening ? 1 : 0.6}>
+      <div className={`${props.isListening ? 'opacity-100' : 'opacity-60'}`} onClick={() => props.setIsListening((isListening) => !isListening)}>
         {value.map(((array, rowIndex) => {
           return (
-            <Flex
+            <div
               key={`#currentSession:${currentSession}-line-${rowIndex}-`}
-              flexDirection="row"
-              alignItems="center"
+              className='flex flew-row items-center'
             >
               {array.map((val, colIndex) => (
                 <React.Fragment
                   key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
                 >
-                  {colIndex === 0 && <Text color="yellow.300" display="inline-block" fontSize="xl" w={12}> {screenCursor + rowIndex} </Text>}
+                  {colIndex === 0 && <p className='inline w-12 text-yellow text-xl'> {screenCursor + rowIndex} </p>}
                   <Character
                     character={val || ""}
                     typed={col === row ? currentTyped : null}
@@ -291,14 +289,14 @@ const Editor: React.FC<Props> = (props) => {
                 </React.Fragment>
               )
               )}
-            </Flex>
+            </div>
           );
         }))}
-      </Box>
+      </div>
       {!props.isListening && (
-        <Box color="normal" textAlign="center" mx="auto" fontWeight="bold">
-          <Text>Click to activate...</Text>
-        </Box>
+        <div className='mx-auto font-bold text-character-normal align-center'>
+          <p>Click to activate...</p>
+        </div>
       )}
 
     </>

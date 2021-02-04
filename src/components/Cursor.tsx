@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box } from "@chakra-ui/core";
+import React, { useState, useEffect, useRef, ReactNode } from "react";
 import { CharacterState } from "../constants/enums";
 
 
 interface Props {
+  children: ReactNode;
   showCursor: boolean;
   character: string;
   characterState: CharacterState;
@@ -11,13 +11,13 @@ interface Props {
 
 const BLINK_SPEED = 500;
 
-const Cursor: React.FC<Props> = (props) => {
+const Cursor: React.FC<Props> = ({ children, showCursor, character, characterState }) => {
 
-  const [display, setDisplay] = useState(true);
+  const [display, setDisplay] = useState<boolean>(true);
   const displayRef: any = useRef();
 
   useEffect(() => {
-    if (props.showCursor) {
+    if (showCursor) {
       clearTimeout(displayRef.current);
       displayRef.current = setTimeout(() => {
         setDisplay(!display);
@@ -26,22 +26,12 @@ const Cursor: React.FC<Props> = (props) => {
     return () => {
       clearTimeout(displayRef.current);
     }
-  }, [props.showCursor, display]);
+  }, [showCursor, display]);
 
   return (
-    <>
-      <Box
-        // display="block"
-        background={display && props.showCursor ? props.characterState.toLowerCase() : "none"}
-        h="26px"
-        w="12.5px"
-        textAlign="center"
-        verticalAlign="center"
-      >
-        {props.character !== "\n" && props.children}
-      </Box>
-      {/* {props.character === "\n" && <Box />} */}
-    </>
+    <div className={`h-10 w-10 text-center align-middle ${display && showCursor ? 'bg-black' : ''}`}>
+      {character !== "\n" && children}
+    </div>
   )
 };
 

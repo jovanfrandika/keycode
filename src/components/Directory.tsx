@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Box, Text, Spinner } from "@chakra-ui/core";
 import { selectFiles, getFileContent, getFilesFromTrees } from "../features/userSlice";
 
 interface Props {
@@ -15,24 +14,22 @@ const Directory: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Box bg="gray.900" mt="0.5rem">
-        {fileTree?.pathname[0] && <Text>[u@keycode]$ pwd</Text>}
+      <div className='mt-4 bg-gray-800'>
+        {fileTree?.pathname[0] && <p>[u@keycode]$ pwd</p>}
         {fileTree?.pathname.map((path: string) => {
           return (
-            <Text key={`path-${path}`} display="inline-block">
+            <p key={`path-${path}`} className="inline">
               {path}/
-            </Text>
+            </p>
           )
         })}
-        {fileTree?.pathname.length - 1 > 0 && <Text>[u@keycode]$ echo "press the 'cd ..' to go to previous directory"</Text>}
-        {fileTree?.pathname.length - 1 > 0 && <Text>press the 'cd ..' to go to previous directory</Text>}
+        {fileTree?.pathname.length - 1 > 0 && <p>[u@keycode]$ echo "press the 'cd ..' to go to previous directory"</p>}
+        {fileTree?.pathname.length - 1 > 0 && <p>press the 'cd ..' to go to previous directory</p>}
         {fileTree?.URLs.length - 1 > 0 &&
-          <Box>
-            <Text display="inline-block">
-              [u@keycode]$ <Text
-                display="inline-block"
-                color="correct"
-                cursor="pointer"
+          <div>
+            <p className='inline'>
+              [u@keycode]$
+              <p className='inline text-character-correct cursor-pointer'
                 onClick={async () => {
                   setIsLoading(true);
                   await dispatch(getFilesFromTrees({
@@ -41,25 +38,20 @@ const Directory: React.FC<Props> = (props) => {
                     pop: true
                   }))
                   setIsLoading(false);
-                }}>cd ..</Text>
-            </Text>
-          </Box>}
-      </Box>
+                }}>cd ..</p>
+            </p>
+          </div>}
+      </div>
       {isLoading ? (
-        <Box mx="auto" my={16} textAlign="center">
-          <Spinner color="normal" size="lg" />
-        </Box>
+        <div className='mx-auto my-16 text-center'>
+          {/* <Spinner color="normal" size="lg" /> */}
+        </div>
       ) : (
-          <Box mx="auto" my={16} textAlign="center">
+          <div className='mx-auto my-16 text-center'>
             {fileTree?.files?.map((file: any, index: number) => (
-              <Box
+              <div
                 key={`file-${file.path}`}
-                cursor="pointer"
-                display="inline-block"
-                bg={file.type === "blob" ? "yellow.50" : "orange.500"}
-                borderRadius="0.5rem"
-                p="1rem"
-                m="0.1rem"
+                className={`inline m-1 p-1 rounded-xl cursor-pointer ${file.type === 'blob' ? 'bg-pink' : 'bg-blue'}`}
                 onClick={async () => {
                   if (file.type === "blob") {
                     setIsLoading(true);
@@ -78,12 +70,12 @@ const Directory: React.FC<Props> = (props) => {
                     setIsLoading(false);
                   }
                 }}>
-                <Text color={file.type === "blob" ? "orange.500" : "yellow.50"}>
+                <p className={file.type === "blob" ? "bg-blue" : "bg-pink"}>
                   {file.path}
-                </Text>
-              </Box>
+                </p>
+              </div>
             ))}
-          </Box>
+          </div>
         )}
 
 

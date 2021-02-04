@@ -3,16 +3,6 @@ import axios from "../axios";
 
 import { HTTP_METHODS } from "../constants/enums";
 import { FETCH_TIMEOUT } from "../constants/index";
-import {
-  Box,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalBody,
-  useDisclosure,
-  Button,
-  Spinner
-} from "@chakra-ui/core";
 
 import { Repository } from "../constants/types";
 
@@ -21,7 +11,6 @@ import GithubInput from "./GithubInput";
 import GithubRepositories from "./GithubRepositories";
 
 const GithubSearch: React.FC = (props) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [value, setValue] = useState<string>("");
   const [repositories, setRepositories] = useState<Repository[]>([]);
@@ -63,24 +52,11 @@ const GithubSearch: React.FC = (props) => {
 
   return (
     <>
-      <Button onClick={onOpen} color="gray.700">Search @Github</Button>
-      <Modal
-        blockScrollOnMount={true}
-        isOpen={isOpen}
-        onClose={onClose}
-      >
-        <ModalOverlay />
-        <ModalContent
-          bg="gray.600"
-          borderRadius="0.5rem"
-          px="25rem"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          width="100%"
-        >
-          <ModalBody>
-            <Box mt="3rem" w={["50rem", "40rem", "30rem"]} pb="5rem" mx="auto" color="normal" position="relative">
+      <div className='text-gray-700' onClick={() => { }}>Search @Github</div>
+      <div className=''>
+        <div className='flex justify-center align-center w-full px-24 bg-gray-600 rounded-xl'>
+          <div>
+            <div className='relative w-50 mx-auto mt-3 pb-5 text-character-normal'>
               <GithubInput value={value} setValue={setValue} />
               <GithubRepositories
                 repositories={repositories}
@@ -89,14 +65,14 @@ const GithubSearch: React.FC = (props) => {
                 setValue={setValue}
                 setIsAutoCompleted={setIsAutoCompleted}
               />
-              <Directory closeModal={onClose} />
-              <Box textAlign="center" mx="auto">
-                {isLoading && <Spinner size="lg" />}
-              </Box>
-            </Box >
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+              <Directory closeModal={() => { }} />
+              <div className="mx-auto align-center">
+                {isLoading && <p>is loading</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

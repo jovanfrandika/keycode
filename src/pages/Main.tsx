@@ -3,10 +3,6 @@ import { useDispatch } from "react-redux";
 import { getFilesFromRepository, getFileContent } from "../features/userSlice";
 import Layout from "../containers/Layout";
 
-import {
-  Flex, Box, Divider, Image, Text, Spinner
-} from "@chakra-ui/core";
-
 import Editor from "../components/Editor"
 import Dashboard from "../components/Dashboard"
 import GithubSearch from "../components/GithubSearch";
@@ -42,60 +38,41 @@ const Main: React.FC = () => {
   return (
     <Layout>
       {isLoading ? (
-        <Flex
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          width="100%"
-          mx="auto"
-          color="normal"
-          mt="1rem">
-          <Box w="250px">
-            <Image src={logo} />
-          </Box>
-          <Box marginBottom="3rem" textAlign="center">
-            <Text letterSpacing="1rem" fontSize="5xl" mb=".9rem">KEYCODES</Text>
-            <Text fontSize="lg" >become a touch typing chad.</Text>
-          </Box>
-          <Spinner mt="4rem" mr="1.3rem" size="xl" />
-        </Flex>
+        <div className='flex flex-col justify-center align-center w-full mx-auto mt-1 text-character-normal'>
+          <div className="w-10">
+            <div style={{ backgroundImage: `url(${logo})` }} />
+          </div>
+          <div className='mb-3 align-center'>
+            <p className="tracking-widest mb-1 text-5xl">KEYCODES</p>
+            <p className="text-xl" >become a touch typing chad.</p>
+          </div>
+        </div>
       ) : (
           <>
-            <Box onClick={() => {
-              if (isListening) {
-                setIsListening(false)
-              }
-            }}
-              width="75rem"
-              pt="2.5rem"
-              pb="10rem"
-            // px="10rem"
+            <div
+              className='w-75 pt-2 pb-10'
+              onClick={() => {
+                if (isListening) {
+                  setIsListening(false)
+                }
+              }}
             >
-              <Box textAlign="center" color="normal" marginBottom={24}>
-                <Text fontSize="4xl" marginBottom={6}>Keycodes</Text>
-                <Text fontSize="lg">become a touch typing chad</Text>
-                <Box mt="2rem">
-                  <GithubSearch />
-                </Box>
-              </Box>
+              <div className='mb-24 text-character-normal align-center'>
+                <p className='mb-6 text-4xl'>Keycodes</p>
+                <p className="font-xl">become a touch typing chad</p>
+                <div className="mt-2">
+                  {/* <GithubSearch /> */}
+                </div>
+              </div>
 
-              <Box
-                width="75rem"
-                py="10rem"
-                bg="gray.600"
-                p="4rem"
-                borderRadius=".25rem"
-              >
+              <div className='w-75 py-10 px-4 bg-gray-600 rounded-xl' >
                 <Header />
-                <Divider my="1.2rem" />
+                <div className="border-t-8 my-1.2" />
                 <Dashboard />
-                <Divider my="1.2rem" />
+                <div className="border-t-8 my-1.2" />
                 <Editor isListening={isListening} setIsListening={setIsListening} />
-
-              </Box>
-            </Box>
-            <Box>
-            </Box>
+              </div>
+            </div>
           </>
 
         )}

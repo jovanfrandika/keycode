@@ -1,21 +1,15 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-import { Flex } from "@chakra-ui/core";
+interface Props {
+  children: ReactNode;
+}
 
-const Layout = (props: any) => {
+const Layout: React.FC<Props> = ({ children }) => {
   return (
     <>
-      <Flex
-        flexDirection="row"
-        // alignItems="center"
-        justifyContent="center"
-        bg="gray.700"
-        // height={["25rem", "50rem", "75rem", "100rem"]}
-        minHeight="100vh"
-        width={["100%"]}
-      >
-        {props.children}
-      </Flex>
+      <div className='flex flex-row justify-center bg-gray-700 min-h-full'>
+        {children}
+      </div>
     </>
   );
 };

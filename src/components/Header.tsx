@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { Text } from "@chakra-ui/core";
 import { selectFiles, selectFile } from "../features/userSlice";
 
 const Header: React.FC = () => {
@@ -10,19 +9,19 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <Text color="white" display="inline-block" mr="1.4rem">
+      <p className='inline mr-1 text-white'>
         Current Session:
-      </Text>
+      </p>
       {fileTree?.pathname.map((path: string) => {
         return (
-          <Text key={`path-${path}`} color="normal" display="inline-block">
+          <p key={`path-${path}`} className='inline text-character-normal'>
             {path}/
-          </Text>
+          </p>
         )
       })}
-      <Text color="white" display="inline-block">
+      <p className='inline text-white'>
         {file.path}
-      </Text>
+      </p>
     </>
   )
 };

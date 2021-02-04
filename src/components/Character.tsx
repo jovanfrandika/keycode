@@ -1,7 +1,5 @@
 import React from "react";
 
-import { Text } from "@chakra-ui/core";
-
 import { CharacterState } from "../constants/enums";
 import Cursor from "./Cursor";
 
@@ -28,9 +26,11 @@ const Character: React.FC<Props> = React.memo((props) => {
       character={props.character}
       characterState={props.characterState}
     >
-      <Text fontSize="xl" color={props.characterState.toLowerCase()}>
+      {/* <Text fontSize="xl" color={props.characterState.toLowerCase()}> */}
+      <p className={`text-xl text-${props.characterState.toLowerCase()}`}>
         {props.character}
-      </Text>
+      </p>
+      {/* </Text> */}
     </Cursor>
   );
 },

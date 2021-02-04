@@ -2,7 +2,6 @@ import React from "react";
 
 import { Repository } from "../constants/types";
 
-import { Flex, Text } from "@chakra-ui/core";
 import { useDispatch } from "react-redux";
 import { getFilesFromRepository } from "../features/userSlice";
 
@@ -17,35 +16,29 @@ interface Props {
 const GithubRepositories: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   return (
-    <Flex
-      position="absolute"
-      zIndex={1}
-      flexDirection="column"
-      bg="white"
-      pb={props.repositories.length ? "1rem" : ""}
-      borderRadius="0 0 0.5rem 0.5rem"
-      w="100%"
-    >
+    <div className='absolute z-10 flex flex-col bg-white pb-1 w-full rounded-xl' >
       {props.repositories.map((repo, index) => (
-        <Flex key={`${repo.name}-${index}`} cursor="pointer" onClick={() => {
-          dispatch(getFilesFromRepository({
-            owner: repo.owner,
-            repo: repo.name,
-          }));
-          if (props.value !== repo.name) {
-            props.setIsAutoCompleted(true);
-            props.setValue(repo.name);
-          }
+        <div
+          key={`${repo.name}-${index}`}
+          className='cursor-pointer'
+          onClick={() => {
+            dispatch(getFilesFromRepository({
+              owner: repo.owner,
+              repo: repo.name,
+            }));
+            if (props.value !== repo.name) {
+              props.setIsAutoCompleted(true);
+              props.setValue(repo.name);
+            }
 
-          props.setRepositories([]);
-        }}>
-          <Text ml="1rem" color="black">
+            props.setRepositories([]);
+          }}>
+          <p className='ml-1 text-black'>
             {repo.name}
-
-          </Text>
-        </Flex>
+          </p>
+        </div>
       ))}
-    </Flex>
+    </div>
   )
 };
 
