@@ -39,9 +39,7 @@ const Main: React.FC = () => {
     <Layout>
       {isLoading ? (
         <div className='flex flex-col justify-center items-center w-full mx-auto mt-1 text-gray-700 dark:text-gray-200'>
-          <div className="w-10">
-            <div className='w-50 h-50' style={{ backgroundImage: `url(${logo})` }} />
-          </div>
+          <div className='w-32 h-32 bg-cover bg-center' style={{ backgroundImage: `url(${logo})` }} />
           <div className='mb-3 align-center'>
             <p className="tracking-widest mb-1 font-bold text-5xl">KEYCODE</p>
             <p className="text-xl" >become a touch typing chad.</p>

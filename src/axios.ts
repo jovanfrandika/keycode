@@ -1,7 +1,7 @@
 import Axios from "axios";
 
 const axios = Axios.create({
-  baseURL: "http://localhost:4000"
+  baseURL: "https://api.frandika.tech/keycode/"
 })
 
 export default axios;
