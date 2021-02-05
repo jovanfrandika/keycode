@@ -21,6 +21,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "./src"
+    "./src",
+    "tailwind.config.js",
+    "craco.config.js"
   ]
 }

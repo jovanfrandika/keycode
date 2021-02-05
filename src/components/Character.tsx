@@ -26,11 +26,9 @@ const Character: React.FC<Props> = React.memo((props) => {
       character={props.character}
       characterState={props.characterState}
     >
-      {/* <Text fontSize="xl" color={props.characterState.toLowerCase()}> */}
-      <p className={`text-xl text-${props.characterState.toLowerCase()}`}>
+      <p className={`text-xl text-character-${props.characterState.toLowerCase()}`}>
         {props.character}
       </p>
-      {/* </Text> */}
     </Cursor>
   );
 },

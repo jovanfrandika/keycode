@@ -18,7 +18,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className='flex text-character-normal justify-evenly w-full' >
+    <div className='flex text-character-normal justify-evenly w-full py-2' >
       <Statistic
         title="WPM"
         amount={statusSelector(1).wpm}

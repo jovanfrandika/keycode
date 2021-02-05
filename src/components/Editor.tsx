@@ -15,7 +15,7 @@ interface Props {
   setIsListening: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Editor: React.FC<Props> = (props) => {
+const Editor: React.FC<Props> = ({ isListening, setIsListening }) => {
   const dispatch = useDispatch();
   const { currentSession } = useSelector(selectUser);
   const { file } = useSelector(selectFile);
@@ -50,6 +50,7 @@ const Editor: React.FC<Props> = (props) => {
       const info = parseRowInformation(file.content);
       setRowInformation(info);
       setValue(transformValue(info.length < SCREEN_LIMIT ? file.content : file.content.slice(0, info[SCREEN_LIMIT].location)));
+      setScreenCursor(0);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,22 +89,15 @@ const Editor: React.FC<Props> = (props) => {
     /**
      * If screen is the last screen in the file.
      */
-    // console.log('masuk');
-    // console.log(`screenCursor: ${screenCursor}`);
-    // console.log(`rowInformation.length: ${rowInformation.length}`);
-    // console.log(`rowInformation.length - screen_limit: ${rowInformation.length - SCREEN_LIMIT}`);
-    const checkScreen = rowInformation.length - SCREEN_LIMIT < rowInformation.length ? SCREEN_LIMIT : rowInformation.length - SCREEN_LIMIT;
-    if (
-      screenCursor === checkScreen
-    ) {
-      console.log('masuk 1');
+    const checkScreen = screenCursor + SCREEN_LIMIT >= rowInformation.length;
+    if (checkScreen) {
       /**
        * If in the last screen, row and col is the last row and col in the screen.
        */
+      console.log(row, col);
       if (row === rowInformation.length - screenCursor - 1 &&
         col === rowInformation[rowInformation.length - 1].col
       ) {
-        console.log('masuk 2');
         // End of the file and the screen, resets back to the beginning.
         calculateStatistics();
         setScreenCursor(0);
@@ -113,29 +107,26 @@ const Editor: React.FC<Props> = (props) => {
     /**
      * If screen just initialized and user just started typing
      */
-    if (row === 0 && col === 0 && props.isListening) {
+    if (row === 0 && col === 0 && isListening) {
       setStart(Date.now());
     }
 
 
+    if (currentTyped?.keyCode === 13 && value[row][col] === "\n") {
+      setCol(0);
+      setCurrentTyped(null);
+      setRow(row + 1);
 
-    if (currentTyped?.keyCode === 13) {
-      if (value[row][col] === "\n") {
-        setCol(0);
-        setCurrentTyped(null);
-        setRow(row + 1);
+      /*
+       *  End of screen
+       */
+      if (row === SCREEN_LIMIT - 1) {
+        calculateStatistics();
+        setScreenCursor(screenCursor + SCREEN_LIMIT);
 
-        /*
-         *  End of screen
-         */
-        if (row === SCREEN_LIMIT - 1) {
-          calculateStatistics();
-          setScreenCursor(screenCursor + SCREEN_LIMIT);
+      };
 
-        };
-
-        setCurrentCharacterState(CharacterState.NORMAL);
-      }
+      setCurrentCharacterState(CharacterState.NORMAL);
     }
     else {
       if (currentTyped !== null && currentTyped !== undefined) {
@@ -160,16 +151,15 @@ const Editor: React.FC<Props> = (props) => {
 
   useEffect(() => {
     resetEditor();
-    if (props.isListening) {
+    if (isListening) {
       window.addEventListener("keypress", handleKeypress);
     }
     else {
-      window.removeEventListener("keypress", handleKeypress, false);
-      window.removeEventListener("keypress", handleKeypress, true);
+      window.removeEventListener("keypress", handleKeypress);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.isListening])
+  }, [isListening])
 
   const handleKeypress = useCallback((event: KeyboardEvent) => {
 
@@ -262,7 +252,7 @@ const Editor: React.FC<Props> = (props) => {
 
   return (
     <>
-      <div className={`${props.isListening ? 'opacity-100' : 'opacity-60'}`} onClick={() => props.setIsListening((isListening) => !isListening)}>
+      <div className={`${isListening ? 'opacity-100' : 'opacity-40'}`} onClick={() => setIsListening(!isListening)}>
         {value.map(((array, rowIndex) => {
           return (
             <div
@@ -273,7 +263,7 @@ const Editor: React.FC<Props> = (props) => {
                 <React.Fragment
                   key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
                 >
-                  {colIndex === 0 && <p className='inline w-12 text-yellow text-xl'> {screenCursor + rowIndex} </p>}
+                  {colIndex === 0 && <p className='inline w-8 text-pink-500 text-xl'> {screenCursor + rowIndex} </p>}
                   <Character
                     character={val || ""}
                     typed={col === row ? currentTyped : null}
@@ -293,8 +283,8 @@ const Editor: React.FC<Props> = (props) => {
           );
         }))}
       </div>
-      {!props.isListening && (
-        <div className='mx-auto font-bold text-character-normal align-center'>
+      {!isListening && (
+        <div className='text-center font-bold text-character-normal'>
           <p>Click to activate...</p>
         </div>
       )}

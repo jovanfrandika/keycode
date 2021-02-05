@@ -14,7 +14,7 @@ const Directory: React.FC<Props> = (props) => {
 
   return (
     <>
-      <div className='mt-4 bg-gray-800'>
+      <div className='w-1/2 mt-4 px-2 text-left bg-gray-800 rounded-lg dark:bg-gray-800'>
         {fileTree?.pathname[0] && <p>[u@keycode]$ pwd</p>}
         {fileTree?.pathname.map((path: string) => {
           return (
@@ -29,7 +29,7 @@ const Directory: React.FC<Props> = (props) => {
           <div>
             <p className='inline'>
               [u@keycode]$
-              <p className='inline text-character-correct cursor-pointer'
+              <span className='text-character-correct cursor-pointer'
                 onClick={async () => {
                   setIsLoading(true);
                   await dispatch(getFilesFromTrees({
@@ -38,7 +38,7 @@ const Directory: React.FC<Props> = (props) => {
                     pop: true
                   }))
                   setIsLoading(false);
-                }}>cd ..</p>
+                }}>cd ..</span>
             </p>
           </div>}
       </div>
@@ -47,11 +47,14 @@ const Directory: React.FC<Props> = (props) => {
           {/* <Spinner color="normal" size="lg" /> */}
         </div>
       ) : (
-          <div className='mx-auto my-16 text-center'>
-            {fileTree?.files?.map((file: any, index: number) => (
-              <div
+          <div className='grid grid-cols-3 mx-auto my-8 text-center'>
+            {fileTree?.files?.map((file: any, index: number) => {
+
+              let isBlob = file.type === 'blob';
+
+              return <div
                 key={`file-${file.path}`}
-                className={`inline m-1 p-1 rounded-xl cursor-pointer ${file.type === 'blob' ? 'bg-pink' : 'bg-blue'}`}
+                className={`inline m-1 p-1 shadow-md rounded-3xl cursor-pointer bg-${isBlob ? 'gray-400' : 'blue-400'}`}
                 onClick={async () => {
                   if (file.type === "blob") {
                     setIsLoading(true);
@@ -70,11 +73,11 @@ const Directory: React.FC<Props> = (props) => {
                     setIsLoading(false);
                   }
                 }}>
-                <p className={file.type === "blob" ? "bg-blue" : "bg-pink"}>
+                <p className={`transition px-2 shadow-md rounded-xl bg-gray-${isBlob ? "600" : "800"} hover:bg-${isBlob ? 'gray-400' : 'blue-400'}`}>
                   {file.path}
                 </p>
               </div>
-            ))}
+            })}
           </div>
         )}
 

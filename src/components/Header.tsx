@@ -8,21 +8,17 @@ const Header: React.FC = () => {
   const { file } = useSelector(selectFile);
 
   return (
-    <>
-      <p className='inline mr-1 text-white'>
-        Current Session:
-      </p>
-      {fileTree?.pathname.map((path: string) => {
-        return (
-          <p key={`path-${path}`} className='inline text-character-normal'>
-            {path}/
-          </p>
-        )
-      })}
-      <p className='inline text-white'>
-        {file.path}
-      </p>
-    </>
+    <div className='ml-1'>
+      <p className='inline text-gray-600'> Current Session: </p>
+      <div className='inline mx-2 px-2 rounded-xl bg-blue-400'>
+        {fileTree?.pathname.map((path: string) => {
+          return (
+            <p key={`path-${path}`} className='inline text-blue-50'> {path}/ </p>
+          )
+        })}
+        <p className='inline text-gray-100'> {file.path} </p>
+      </div>
+    </div>
   )
 };
 

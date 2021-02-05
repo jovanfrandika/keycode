@@ -38,38 +38,37 @@ const Main: React.FC = () => {
   return (
     <Layout>
       {isLoading ? (
-        <div className='flex flex-col justify-center align-center w-full mx-auto mt-1 text-character-normal'>
+        <div className='flex flex-col justify-center items-center w-full mx-auto mt-1 text-gray-700 dark:text-gray-200'>
           <div className="w-10">
-            <div style={{ backgroundImage: `url(${logo})` }} />
+            <div className='w-50 h-50' style={{ backgroundImage: `url(${logo})` }} />
           </div>
           <div className='mb-3 align-center'>
-            <p className="tracking-widest mb-1 text-5xl">KEYCODES</p>
+            <p className="tracking-widest mb-1 font-bold text-5xl">KEYCODE</p>
             <p className="text-xl" >become a touch typing chad.</p>
           </div>
         </div>
       ) : (
           <>
             <div
-              className='w-75 pt-2 pb-10'
+              className='w-1/2 pb-10'
               onClick={() => {
                 if (isListening) {
                   setIsListening(false)
                 }
               }}
             >
-              <div className='mb-24 text-character-normal align-center'>
-                <p className='mb-6 text-4xl'>Keycodes</p>
-                <p className="font-xl">become a touch typing chad</p>
-                <div className="mt-2">
-                  {/* <GithubSearch /> */}
-                </div>
+              <div className='flex flex-col mb-24 align-middle text-center text-gray-700 dark:text-gray-200'>
+                <p className="tracking-widest mb-1 font-bold text-5xl">KEYCODE</p>
+                <p className="text-xl" >become a touch typing chad.</p>
+                <div className="mt-16"> <GithubSearch /> </div>
               </div>
 
-              <div className='w-75 py-10 px-4 bg-gray-600 rounded-xl' >
-                <Header />
-                <div className="border-t-8 my-1.2" />
+              <Header />
+              <div className='my-1 bg-white rounded-t-xl'>
                 <Dashboard />
-                <div className="border-t-8 my-1.2" />
+              </div>
+
+              <div className='px-4 pb-8 bg-gray-500 rounded-b-xl dark:bg-gray-300' >
                 <Editor isListening={isListening} setIsListening={setIsListening} />
               </div>
             </div>

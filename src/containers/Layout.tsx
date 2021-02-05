@@ -7,7 +7,7 @@ interface Props {
 const Layout: React.FC<Props> = ({ children }) => {
   return (
     <>
-      <div className='flex flex-row justify-center bg-gray-700 min-h-full'>
+      <div className='flex flex-row justify-center items-center bg-gray-200 min-h-screen dark:bg-gray-700'>
         {children}
       </div>
     </>
