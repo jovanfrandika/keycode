@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, ReactNode } from "react";
-import { CharacterState } from "../constants/enums";
+import clsx from "clsx";
 
+import { CharacterState } from "../constants/enums";
 
 interface Props {
   children: ReactNode;
@@ -13,6 +14,7 @@ const BLINK_SPEED = 500;
 
 const Cursor: React.FC<Props> = ({ children, showCursor, character, characterState }) => {
 
+  const [bgColor, setBgColor] = useState<string>("");
   const [display, setDisplay] = useState<boolean>(true);
   const displayRef: any = useRef();
 
@@ -28,8 +30,21 @@ const Cursor: React.FC<Props> = ({ children, showCursor, character, characterSta
     }
   }, [showCursor, display]);
 
+  useEffect(() => {
+
+
+    switch (characterState) {
+      case CharacterState.CORRECT: setBgColor("bg-green-300"); break;
+      case CharacterState.WRONG: setBgColor("bg-red-300"); break;
+      default: setBgColor("bg-gray-300");
+    }
+
+  }, [characterState])
+
+
+
   return (
-    <div className={`h-7 w-4 text-center align-middle ${display && showCursor ? 'bg-character-' + characterState.toLowerCase() : ''}`}>
+    <div className={clsx("h-7 w-4 text-center align-middle bg-opacity-50 ", { [`${bgColor}`]: display && showCursor })}>
       {character !== "\n" && children}
     </div>
   )
