@@ -5,7 +5,7 @@
 
 **Keycodes** is an application that was made to help programmers **boost their typing speed** by actually **typing real codes** instead of random examples. By using real codes from **public code repositories** that you can search in Github, you can learn to touch type in coding better where there are tons of rarely typed symbols.
 
-DEMO LINK: https://confident-galileo-8ccccf.netlify.app/
+LINK: https://keycode.frandika.com/
 
 ### Technologies & Stacks
 - [React.js](https://reactjs.org/)
