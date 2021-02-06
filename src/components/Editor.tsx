@@ -94,7 +94,6 @@ const Editor: React.FC<Props> = ({ isListening, setIsListening }) => {
       /**
        * If in the last screen, row and col is the last row and col in the screen.
        */
-      console.log(row, col);
       if (row === rowInformation.length - screenCursor - 1 &&
         col === rowInformation[rowInformation.length - 1].col
       ) {
@@ -263,7 +262,7 @@ const Editor: React.FC<Props> = ({ isListening, setIsListening }) => {
                 <React.Fragment
                   key={`#currentSession:${currentSession}-line-${rowIndex}-value-${val}-${colIndex}`}
                 >
-                  {colIndex === 0 && <p className='inline w-8 text-pink-500 text-xl'> {screenCursor + rowIndex} </p>}
+                  {colIndex === 0 && <p className='inline w-8 text-red-300 text-xl'> {screenCursor + rowIndex} </p>}
                   <Character
                     character={val || ""}
                     typed={col === row ? currentTyped : null}

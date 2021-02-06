@@ -7,6 +7,12 @@ interface Props {
   closeModal: () => void;
 };
 
+interface FileProps {
+  url: string;
+  type: string;
+  path: string;
+}
+
 const Directory: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -48,33 +54,40 @@ const Directory: React.FC<Props> = (props) => {
         </div>
       ) : (
           <div className='grid grid-cols-3 mx-auto my-8 text-center'>
-            {fileTree?.files?.map((file: any, index: number) => {
+            {fileTree?.files?.map(({ url, type, path }: FileProps, index: number) => {
 
-              let isBlob = file.type === 'blob';
+              let isBlob = type === 'blob';
+              let notAllowedFiles = [".md", ".json", ".pdf"];
+              let regex = new RegExp("([a-zA-Z0-9_.:])+(" + notAllowedFiles.join('|') + ")$");
+
+              if (regex.test(path)) {
+                return <React.Fragment key={`file-${path}`} ></React.Fragment>
+              }
+
 
               return <div
-                key={`file-${file.path}`}
+                key={`file-${path}`}
                 className={`inline m-1 p-1 shadow-md rounded-3xl cursor-pointer bg-${isBlob ? 'gray-400' : 'blue-400'}`}
                 onClick={async () => {
-                  if (file.type === "blob") {
+                  if (type === "blob") {
                     setIsLoading(true);
                     await dispatch(getFileContent({
-                      url: file.url,
-                      path: file.path,
+                      url: url,
+                      path: path,
                     }))
                     setIsLoading(false);
                     props.closeModal()
                   } else {
                     setIsLoading(true);
                     await dispatch(getFilesFromTrees({
-                      url: file.url,
-                      path: file.path
+                      url: url,
+                      path: path
                     }))
                     setIsLoading(false);
                   }
                 }}>
                 <p className={`transition px-2 shadow-md rounded-xl bg-gray-${isBlob ? "600" : "800"} hover:bg-${isBlob ? 'gray-400' : 'blue-400'}`}>
-                  {file.path}
+                  {path}
                 </p>
               </div>
             })}

@@ -66,7 +66,7 @@ const Main: React.FC = () => {
                 <Dashboard />
               </div>
 
-              <div className='px-4 pb-8 bg-gray-500 rounded-b-xl dark:bg-gray-300' >
+              <div className='px-4 pb-8 bg-gray-500 rounded-b-xl dark:bg-gray-600' >
                 <Editor isListening={isListening} setIsListening={setIsListening} />
               </div>
             </div>

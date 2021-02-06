@@ -1,7 +1,7 @@
 import Axios from "axios";
 
 const axios = Axios.create({
-  baseURL: "https://api.frandika.tech/keycode/"
+  baseURL: process.env.REACT_APP_BASE_URL
 })
 
 export default axios;

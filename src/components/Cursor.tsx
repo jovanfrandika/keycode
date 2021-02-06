@@ -29,7 +29,7 @@ const Cursor: React.FC<Props> = ({ children, showCursor, character, characterSta
   }, [showCursor, display]);
 
   return (
-    <div className={`h-8 w-6 text-center align-middle ${display && showCursor ? 'bg-character-' + characterState.toLowerCase() : ''}`}>
+    <div className={`h-7 w-4 text-center align-middle ${display && showCursor ? 'bg-character-' + characterState.toLowerCase() : ''}`}>
       {character !== "\n" && children}
     </div>
   )

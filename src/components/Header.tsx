@@ -9,7 +9,7 @@ const Header: React.FC = () => {
 
   return (
     <div className='ml-1'>
-      <p className='inline text-gray-600'> Current Session: </p>
+      <p className='inline text-gray-600 dark:text-gray-200'> Current Session: </p>
       <div className='inline mx-2 px-2 rounded-xl bg-blue-400'>
         {fileTree?.pathname.map((path: string) => {
           return (
